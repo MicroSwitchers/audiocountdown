@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Visual Timer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Face Observer library to reliably detect when fonts are loaded -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fontfaceobserver/2.1.0/fontfaceobserver.standalone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            touch-action: none; /* Prevents scrolling on mobile while dragging */
+            /* Hide content until the font is loaded to prevent flash */
+            visibility: hidden;
+        }
+        body.fonts-loaded {
+            visibility: visible;
+        }
+        canvas {
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="flex flex-col">
+
+    <main id="timer-container" class="relative flex-grow w-full flex items-center justify-center p-4 sm:p-8">
+        <canvas id="timer-canvas"></canvas>
+    </main>
+        
+    <script>
+        // Use FontFaceObserver for a rock-solid font loading strategy.
+        const fontObserver = new FontFaceObserver('Inter', {
+            weight: 900
+        });
+
+        // The .load() method returns a promise that resolves when the font is ready.
+        fontObserver.load().then(() => {
+            document.body.classList.add('fonts-loaded');
+            startApp();
+        }).catch((e) => {
+            console.error('Font could not be loaded.', e);
+            document.body.classList.add('fonts-loaded');
+            startApp();
+        });
+
+        const startApp = () => {
+            // DOM Elements
+            const canvas = document.getElementById('timer-canvas');
+            
+            if (!canvas) {
+                console.error("Canvas element not found!");
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+
+            // --- Timer Configuration ---
+            const timerConfig = {
+                color: 'rgba(239, 68, 68, 0.9)', // Red
+                maxTime: 3600, // 60 minutes in seconds
+                majorTickSeconds: 300, // Every 5 minutes
+                minorTickSeconds: 60 // Every 1 minute
+            };
+
+            // Timer State
+            let isSettingTime = false;
+            let remainingSeconds = 0;
+            let lastSetSeconds = -1; 
+            let countdownInterval = null;
+            let isAudioInitialized = false;
+            let speechTimeout = null; 
+
+            let audioContext;
+
+            // --- Audio Initialization & Browser-Native Sound Generation ---
+            const initAudio = () => {
+                if (isAudioInitialized) return;
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                isAudioInitialized = true;
+            };
+
+            const playSound = (freq, type, volume, duration, startTime) => {
+                if (!isAudioInitialized) return;
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(freq, startTime);
+                gainNode.gain.setValueAtTime(volume, startTime);
+                
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+                oscillator.start(startTime);
+                oscillator.stop(startTime + duration);
+            };
+
+            const playFinishSound = () => {
+                if (!isAudioInitialized) return;
+                const now = audioContext.currentTime;
+                playSound(523.25, 'triangle', 0.3, 0.15, now); // C5
+                playSound(698.46, 'triangle', 0.3, 0.15, now + 0.2); // G5
+                playSound(1046.50, 'triangle', 0.3, 0.15, now + 0.4); // C6
+            };
+
+            // --- Speech Synthesis ---
+            const speak = (text) => {
+                if (!('speechSynthesis' in window)) return;
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                speechSynthesis.speak(utterance);
+            };
+
+            const announceTime = (isStarting) => {
+                if (remainingSeconds <= 0 && !isStarting) return;
+
+                const minutes = Math.floor(remainingSeconds / 60);
+                const secondsOnly = remainingSeconds % 60;
+                let timeString = "";
+                
+                if (minutes > 0) {
+                    timeString = `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+                    if (secondsOnly > 0) {
+                        timeString += ` and ${secondsOnly} ${secondsOnly === 1 ? 'second' : 'seconds'}`;
+                    }
+                } else {
+                    timeString = `${secondsOnly} ${secondsOnly === 1 ? 'second' : 'seconds'}`;
+                }
+
+                const textToSpeak = isStarting ? `Counting down ${timeString}` : timeString;
+                speak(textToSpeak);
+            };
+
+            const announceCancel = () => speak("Timer returned to 0, cancelling timer.");
+            const announceFinish = () => speak("Time");
+
+            const announceRemainingTime = () => {
+                const minutes = Math.round(remainingSeconds / 60);
+                if (minutes === 0) return;
+
+                if (remainingSeconds > 300 && remainingSeconds % 300 === 0) {
+                    speak(`${minutes} minutes remaining`);
+                } 
+                else if (remainingSeconds <= 300 && remainingSeconds % 60 === 0) {
+                    speak(`${minutes} ${minutes === 1 ? 'minute' : 'minutes'} remaining`);
+                }
+            };
+
+            // --- Canvas Drawing ---
+            const setupCanvas = () => {
+                const container = document.getElementById('timer-container');
+                const dpr = window.devicePixelRatio || 1;
+                
+                const rect = container.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                canvas.style.width = `${rect.width}px`;
+                canvas.style.height = `${rect.height}px`;
+
+                ctx.scale(dpr, dpr);
+                redrawCanvas();
+            };
+
+            const redrawCanvas = () => {
+                const width = canvas.width / (window.devicePixelRatio || 1);
+                const height = canvas.height / (window.devicePixelRatio || 1);
+                const maxTimeSeconds = timerConfig.maxTime;
+                
+                if (width <= 0 || height <= 0) return;
+
+                ctx.clearRect(0, 0, width, height);
+
+                // 1. Draw background track
+                ctx.fillStyle = '#e5e7eb'; // Gray-200
+                ctx.fillRect(0, 0, width, height);
+
+                // 2. Draw the active time bar
+                if (remainingSeconds > 0) {
+                    const activeHeight = (remainingSeconds / maxTimeSeconds) * height;
+                    ctx.fillStyle = timerConfig.color;
+                    ctx.fillRect(0, height - activeHeight, width, activeHeight);
+                }
+
+                // 3. Draw tick marks and numbers on top
+                const largeFontSize = Math.max(16, width * 0.08); 
+                // **FIX:** Further reduced the font size for the 5-minute marks
+                const smallFontSize = Math.max(12, width * 0.05); 
+                ctx.textBaseline = 'middle';
+                ctx.textAlign = 'left';
+
+                // New staggered drawing logic, all on the left
+                for (let s = 0; s <= maxTimeSeconds; s += timerConfig.minorTickSeconds) {
+                    if (s === 0) continue; // Don't draw a tick at the very bottom
+                    
+                    const yPos = height - ((s / maxTimeSeconds) * height);
+                    const minuteVal = s / 60;
+                    
+                    let tickLength;
+                    let tickWidth;
+                    let shouldDrawNumber = false;
+                    let isMajorInterval = false;
+
+                    if (minuteVal % 10 === 0) { // 10, 20, 30...
+                        tickLength = width * 0.15; 
+                        tickWidth = 4;
+                        shouldDrawNumber = true;
+                        isMajorInterval = true;
+                    } else if (minuteVal % 5 === 0) { // 5, 15, 25...
+                        tickLength = width * 0.3; 
+                        tickWidth = 4;
+                        shouldDrawNumber = true;
+                    } else { // 1, 2, 3, 4, 6...
+                        tickLength = width * 0.08;
+                        tickWidth = 2.5;
+                    }
+
+                    ctx.beginPath();
+                    ctx.moveTo(0, yPos);
+                    ctx.lineTo(tickLength, yPos);
+                    ctx.strokeStyle = shouldDrawNumber ? '#1f2937' : '#9ca3af';
+                    ctx.lineWidth = tickWidth;
+                    ctx.stroke();
+
+                    if (shouldDrawNumber) {
+                        const fontSize = isMajorInterval ? largeFontSize : smallFontSize;
+                        ctx.font = `900 ${fontSize}px Inter`;
+                        ctx.fillStyle = '#111827';
+                        ctx.fillText(minuteVal.toString(), tickLength + (fontSize * 0.5), yPos);
+                    }
+                }
+            };
+
+            // --- Timer Logic ---
+            const startCountdown = () => {
+                if (countdownInterval) clearInterval(countdownInterval);
+                if (remainingSeconds <= 0) return;
+
+                countdownInterval = setInterval(() => {
+                    remainingSeconds--;
+                    
+                    if (isAudioInitialized) {
+                        const now = audioContext.currentTime;
+                        if (remainingSeconds > 0 && remainingSeconds % 300 === 0) {
+                            playSound(880, 'square', 0.2, 0.2, now);
+                        } else if (remainingSeconds > 0 && remainingSeconds % 60 === 0) {
+                            playSound(440, 'triangle', 0.1, 0.1, now);
+                        } else {
+                            playSound(880, 'sine', 0.05, 0.05, now);
+                        }
+                    }
+
+                    announceRemainingTime();
+                    redrawCanvas();
+                    if (remainingSeconds <= 0) {
+                        finishTimer();
+                    }
+                }, 1000);
+            };
+
+            const finishTimer = () => {
+                 clearInterval(countdownInterval);
+                 countdownInterval = null;
+                 playFinishSound();
+                 setTimeout(announceFinish, 700);
+            }
+            
+            const resetTimer = () => {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                remainingSeconds = 0;
+                clearTimeout(speechTimeout);
+                if ('speechSynthesis' in window) {
+                    speechSynthesis.cancel();
+                }
+                redrawCanvas();
+            }
+
+            // --- Event Handling ---
+            const getSecondsFromEvent = (e) => {
+                const maxTimeSeconds = timerConfig.maxTime;
+                const rect = canvas.getBoundingClientRect();
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                
+                // Calculate percentage from bottom (0.0) to top (1.0)
+                const percentage = Math.max(0, Math.min(1, 1 - (y / rect.height)));
+                
+                let calculatedSeconds = percentage * maxTimeSeconds;
+
+                // Snap to the nearest second
+                return Math.round(calculatedSeconds);
+            };
+
+            const handleStart = (e) => {
+                e.preventDefault();
+                initAudio();
+                resetTimer();
+                isSettingTime = true;
+                remainingSeconds = getSecondsFromEvent(e);
+                lastSetSeconds = remainingSeconds; 
+                redrawCanvas();
+            };
+
+            const handleMove = (e) => {
+                if (!isSettingTime) return;
+                e.preventDefault();
+                const currentSeconds = getSecondsFromEvent(e);
+
+                if (currentSeconds !== lastSetSeconds) {
+                    remainingSeconds = currentSeconds;
+                    lastSetSeconds = currentSeconds;
+                    redrawCanvas();
+                    clearTimeout(speechTimeout);
+                    speechTimeout = setTimeout(() => announceTime(false), 1000);
+                }
+            };
+
+            const handleEnd = (e) => {
+                if (!isSettingTime) return;
+                e.preventDefault();
+                clearTimeout(speechTimeout);
+                isSettingTime = false;
+                
+                if (remainingSeconds > 0) {
+                    announceTime(true);
+                    startCountdown();
+                } else {
+                    resetTimer();
+                    announceCancel();
+                }
+            };
+
+            // --- Initial Setup ---
+            canvas.addEventListener('mousedown', handleStart);
+            canvas.addEventListener('mousemove', handleMove);
+            document.addEventListener('mouseup', handleEnd);
+            canvas.addEventListener('mouseleave', (e) => { if (isSettingTime) handleEnd(e); });
+            
+            canvas.addEventListener('touchstart', handleStart, { passive: false });
+            canvas.addEventListener('touchmove', handleMove, { passive: false });
+            canvas.addEventListener('touchend', handleEnd);
+
+            window.addEventListener('resize', setupCanvas);
+            
+            setupCanvas();
+        };
+    </script>
+</body>
+</html>

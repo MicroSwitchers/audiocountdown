@@ -163,22 +163,22 @@
 
             // --- Canvas Drawing ---
             const setupCanvas = () => {
-                const container = document.getElementById('timer-container');
+                const rect = canvas.getBoundingClientRect();
                 const dpr = window.devicePixelRatio || 1;
-                
-                const rect = container.getBoundingClientRect();
+
                 canvas.width = rect.width * dpr;
                 canvas.height = rect.height * dpr;
-                canvas.style.width = `${rect.width}px`;
-                canvas.style.height = `${rect.height}px`;
-
-                ctx.scale(dpr, dpr);
+                
+                // **FIX:** Reset the transform matrix before scaling. This is the key to preventing the "zoom" bug.
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                
                 redrawCanvas();
             };
 
             const redrawCanvas = () => {
-                const width = canvas.width / (window.devicePixelRatio || 1);
-                const height = canvas.height / (window.devicePixelRatio || 1);
+                // **FIX:** Always use the canvas's clientWidth/clientHeight for logical dimensions.
+                const width = canvas.clientWidth;
+                const height = canvas.clientHeight;
                 const maxTimeSeconds = timerConfig.maxTime;
                 
                 if (width <= 0 || height <= 0) return;
@@ -198,14 +198,13 @@
 
                 // 3. Draw tick marks and numbers on top
                 const largeFontSize = Math.max(16, width * 0.08); 
-                // **FIX:** Further reduced the font size for the 5-minute marks
-                const smallFontSize = Math.max(12, width * 0.05); 
+                const smallFontSize = Math.max(12, width * 0.05);
                 ctx.textBaseline = 'middle';
                 ctx.textAlign = 'left';
 
-                // New staggered drawing logic, all on the left
+                // Staggered drawing logic
                 for (let s = 0; s <= maxTimeSeconds; s += timerConfig.minorTickSeconds) {
-                    if (s === 0) continue; // Don't draw a tick at the very bottom
+                    if (s === 0) continue;
                     
                     const yPos = height - ((s / maxTimeSeconds) * height);
                     const minuteVal = s / 60;
@@ -215,16 +214,16 @@
                     let shouldDrawNumber = false;
                     let isMajorInterval = false;
 
-                    if (minuteVal % 10 === 0) { // 10, 20, 30...
+                    if (minuteVal % 10 === 0) {
                         tickLength = width * 0.15; 
                         tickWidth = 4;
                         shouldDrawNumber = true;
                         isMajorInterval = true;
-                    } else if (minuteVal % 5 === 0) { // 5, 15, 25...
+                    } else if (minuteVal % 5 === 0) {
                         tickLength = width * 0.3; 
                         tickWidth = 4;
                         shouldDrawNumber = true;
-                    } else { // 1, 2, 3, 4, 6...
+                    } else {
                         tickLength = width * 0.08;
                         tickWidth = 2.5;
                     }
@@ -296,12 +295,10 @@
                 const rect = canvas.getBoundingClientRect();
                 const y = (e.clientY || e.touches[0].clientY) - rect.top;
                 
-                // Calculate percentage from bottom (0.0) to top (1.0)
                 const percentage = Math.max(0, Math.min(1, 1 - (y / rect.height)));
                 
                 let calculatedSeconds = percentage * maxTimeSeconds;
 
-                // Snap to the nearest second
                 return Math.round(calculatedSeconds);
             };
 

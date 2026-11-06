@@ -1,0 +1,16 @@
+{
+  "id":"./",
+  "name":"Visual Countdown — See time passing",
+  "short_name":"Visual Timer",
+  "description":"An accessible visual and audio countdown timer",
+  "start_url":"./",
+  "scope":"./",
+  "display":"standalone",
+  "orientation":"any",
+  "background_color":"#f7f7f5",
+  "theme_color":"#f7f7f5",
+  "icons":[
+    {"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
+}

@@ -3,108 +3,94 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#f7f7f5">
-  <meta name="description" content="A clear, accessible visual countdown timer with optional sound and spoken reminders. Works offline.">
-  <meta name="color-scheme" content="light">
-  <title>Visual Countdown — See time passing</title>
-  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <meta name="theme-color" content="#101820">
+  <meta name="description" content="A high-contrast visual and talking countdown timer with immediate spoken feedback. Touch, drag, or use accessible buttons to set time.">
+  <title>Visual Countdown — Talking timer</title>
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css">
-  <script defer src="./app.js"></script>
+  <script src="./app.js" defer></script>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="site-header">
-      <div class="brand" aria-label="Visual Countdown">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 32 32" fill="none"><rect x="5" y="4" width="22" height="24" rx="7" fill="#172b35"/><path d="M8 19c6-3 10 4 16-2v4a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6z" fill="#ff805e"/><path d="M8 11h16" stroke="#fff" stroke-opacity=".56" stroke-width="1.7"/></svg>
-        </span>
-        <div><strong>Visual Countdown</strong><span class="brand-subtitle">See time passing</span></div>
+  <div class="app" id="fullscreenApp">
+    <header class="topbar">
+      <div class="identity">
+        <strong>Visual Countdown</strong>
+        <span>Touch. Hear. Count down.</span>
       </div>
-      <div class="header-actions">
-        <button id="soundShortcut" class="icon-button sound-shortcut" type="button" aria-label="Mute sound" title="Mute sound"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M17 9a5 5 0 0 1 0 6M19.5 6a9 9 0 0 1 0 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-        <button id="fullscreenButton" class="header-button" type="button" title="Make timer full screen"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Fullscreen</span></button>
+      <div class="top-actions">
+        <button type="button" id="voiceToggle" class="top-button" aria-pressed="true" aria-label="Voice on. Turn voice off">🔊 <span id="voiceToggleLabel">Voice on</span></button>
+        <button type="button" id="fullscreenButton" class="top-button" aria-label="Enter fullscreen">⛶ <span>Full screen</span></button>
       </div>
     </header>
 
-    <main class="main-layout">
-      <section class="timer-column" aria-label="Visual countdown timer">
-        <div id="timerStage" class="timer-stage" role="slider" tabindex="0" aria-label="Timer duration. Drag, tap, or use arrow keys to set time" aria-valuemin="0" aria-valuemax="3600" aria-valuenow="0" aria-valuetext="Zero minutes. Timer ready" aria-describedby="stageInstructions">
-          <canvas id="timerCanvas" aria-hidden="true"></canvas>
-          <div class="stage-top overlay" aria-hidden="true"><span id="stageStatus" class="status-pill"><i></i>Ready</span><span id="stageScale" class="scale-pill">60-minute scale</span></div>
-          <div class="time-center overlay" aria-hidden="true">
-            <div class="time-kicker" id="timeKicker">YOUR TIME, AT A GLANCE</div>
-            <div class="time-digits" id="timeDigits">00:00</div>
-            <div class="time-description" id="timeDescription">Tap or drag to set a countdown</div>
+    <main class="workspace">
+      <section class="timer-area" aria-label="Countdown">
+        <div class="stage-wrap">
+          <div id="timerStage" class="timer-stage" role="slider" tabindex="0"
+            aria-label="Countdown ruler. Use up and down arrows to set a time. Enter to start."
+            aria-valuemin="0" aria-valuemax="900" aria-valuenow="0"
+            aria-valuetext="No time selected" aria-describedby="stageInstructions">
+            <canvas id="timerCanvas" aria-hidden="true"></canvas>
+            <div class="stage-header" aria-hidden="true"><span id="stageStatus" class="status">READY</span><span id="stageScale">15-minute ruler</span></div>
+            <div class="time-display" aria-hidden="true">
+              <span id="timeKicker" class="kicker">SET YOUR TIME</span>
+              <span id="timeDigits" class="digits">00:00</span>
+              <span id="timeDescription" class="timer-desc">Touch or drag to choose a time</span>
+            </div>
+            <div class="stage-footer" aria-hidden="true"><span id="percentLabel">Ready</span><span id="finishAt"></span></div>
           </div>
-          <div class="stage-bottom overlay" aria-hidden="true"><span id="percentLabel">Ready to begin</span><span id="finishAt"></span></div>
-          <div class="fullscreen-controls" id="fullscreenControls">
-            <button id="fsPause" class="fullscreen-control" type="button">Pause</button>
-            <button id="fsRestart" class="fullscreen-control" type="button">Restart</button>
-            <button id="fsExit" class="fullscreen-control" type="button">Exit fullscreen</button>
-          </div>
+          <div class="ruler-control"><button id="scaleButton" type="button" aria-label="Ruler range: 15 minutes. Change ruler range">Ruler range: <strong id="scaleValue">15 min</strong> <span aria-hidden="true">↻</span></button><span>Changes how much time the ruler covers</span></div>
         </div>
-
-        <div class="transport" aria-label="Timer controls">
-          <button class="primary-button" type="button" id="startPause" disabled><span id="startPauseIcon" aria-hidden="true">▶</span><span id="startPauseLabel">Start</span></button>
-          <button class="secondary-button" type="button" id="restart" disabled><span aria-hidden="true">↻</span> Restart</button>
-          <button class="secondary-button" type="button" id="clear" disabled><span aria-hidden="true">×</span> Clear</button>
+        <div class="main-actions" role="group" aria-label="Countdown controls">
+          <button id="startPause" type="button" class="action primary" disabled><span id="startPauseIcon" aria-hidden="true">▶</span><span id="startPauseLabel">Start</span></button>
+          <button id="hearTime" type="button" class="action listen"><span aria-hidden="true">🔊</span> Hear time</button>
+          <button id="restart" type="button" class="action reset" disabled><span aria-hidden="true">↻</span> Restart</button>
+          <button id="clear" type="button" class="action clear" disabled>Clear</button>
         </div>
-        <p id="stageInstructions" class="stage-instructions">Touch anywhere on the timer to set a duration, then release to start. Drag up for more time, down for less. <span class="keyboard-tip">Keyboard: ↑ ↓ to adjust · Space to pause or resume.</span></p>
+        <p class="hint" id="stageInstructions">Touch or drag up and down the timer. It speaks the time you choose. Release to start. While running, touch the timer to hear how much time is left.</p>
       </section>
 
-      <aside class="settings-column" aria-label="Timer options">
-        <section class="control-card presets-card" aria-labelledby="quickHeading">
-          <div class="card-heading"><div><span class="eyebrow">ONE TAP</span><h2 id="quickHeading">Quick timers</h2></div><span class="heading-mark" aria-hidden="true">↗</span></div>
-          <div id="presets" class="preset-grid" role="group" aria-label="Start a preset countdown">
-            <button class="preset" type="button" data-seconds="60"><strong>1</strong><span>min</span></button>
-            <button class="preset" type="button" data-seconds="180"><strong>3</strong><span>min</span></button>
-            <button class="preset" type="button" data-seconds="300"><strong>5</strong><span>min</span></button>
-            <button class="preset" type="button" data-seconds="600"><strong>10</strong><span>min</span></button>
-            <button class="preset" type="button" data-seconds="900"><strong>15</strong><span>min</span></button>
-            <button class="preset" type="button" data-seconds="1200"><strong>20</strong><span>min</span></button>
-            <button class="preset" type="button" data-seconds="1800"><strong>30</strong><span>min</span></button>
-            <button class="preset" type="button" data-seconds="2700"><strong>45</strong><span>min</span></button>
-            <button class="preset" type="button" data-seconds="3600"><strong>60</strong><span>min</span></button>
+      <section class="simple-controls" aria-label="Set time and speech">
+        <div class="control-block">
+          <h2>Set time</h2>
+          <div class="adjust-row" role="group" aria-label="Change the time by one minute">
+            <button id="minusMinute" type="button" class="adjust" aria-label="Subtract one minute">− 1 min</button>
+            <div class="adjust-readout" id="selectedReadout" aria-live="off">0 min</div>
+            <button id="plusMinute" type="button" class="adjust" aria-label="Add one minute">+ 1 min</button>
           </div>
-        </section>
-
-        <section class="control-card" aria-labelledby="customHeading">
-          <div class="card-heading"><div><span class="eyebrow">SET IT YOUR WAY</span><h2 id="customHeading">Custom timer</h2></div></div>
-          <form id="customForm" class="custom-form">
-            <div class="number-field"><label for="customMinutes">Minutes</label><input id="customMinutes" type="number" min="0" max="120" step="1" inputmode="numeric" value="10" required></div>
-            <span class="colon" aria-hidden="true">:</span>
-            <div class="number-field"><label for="customSeconds">Seconds</label><input id="customSeconds" type="number" min="0" max="59" step="1" inputmode="numeric" value="0" required></div>
-            <button id="customStart" class="custom-start" type="submit">Start <span aria-hidden="true">→</span></button>
+          <div id="presets" class="preset-grid" role="group" aria-label="Quick timers. Each button starts its timer immediately.">
+            <button type="button" data-seconds="60" aria-label="Start one minute countdown">1 min</button>
+            <button type="button" data-seconds="180" aria-label="Start three minute countdown">3 min</button>
+            <button type="button" data-seconds="300" aria-label="Start five minute countdown">5 min</button>
+            <button type="button" data-seconds="600" aria-label="Start ten minute countdown">10 min</button>
+            <button type="button" data-seconds="900" aria-label="Start fifteen minute countdown">15 min</button>
+            <button type="button" data-seconds="1800" aria-label="Start thirty minute countdown">30 min</button>
+          </div>
+          <form id="customForm" class="custom-form" aria-label="Start a custom timer">
+            <div><label for="customMinutes">Minutes</label><input id="customMinutes" type="number" min="0" max="120" step="1" value="10" inputmode="numeric" required></div>
+            <div><label for="customSeconds">Seconds</label><input id="customSeconds" type="number" min="0" max="59" step="1" value="0" inputmode="numeric" required></div>
+            <button type="submit" class="custom-start">Start custom</button>
           </form>
-          <div class="setting-row range-row"><label for="scaleSelect">Timer scale</label><select id="scaleSelect"><option value="300">5 min</option><option value="600">10 min</option><option value="900">15 min</option><option value="1800">30 min</option><option value="3600" selected>60 min</option><option value="7200">120 min</option></select></div>
-          <p class="setting-help">Changing the scale changes the ruler, not the timer's speed.</p>
-        </section>
-
-        <section class="control-card" aria-labelledby="audioHeading">
-          <div class="card-heading"><div><span class="eyebrow">HEAR TIME PASSING</span><h2 id="audioHeading">Sound & voice</h2></div></div>
-          <div class="setting-row stacked"><label for="soundMode">Timer sounds</label><select id="soundMode"><option value="gentle">Gentle cues</option><option value="ticking">Tick each second</option><option value="silent">Silent</option></select></div>
-          <div class="setting-row stacked"><label for="voiceMode">Spoken reminders</label><select id="voiceMode"><option value="milestones">Key moments</option><option value="minute">Every minute</option><option value="off">Off</option></select></div>
-          <div class="setting-row stacked"><label for="volume">Sound volume <span id="volumeValue" class="range-output">50%</span></label><input id="volume" type="range" min="0" max="100" step="5" value="50"></div>
-          <button id="testSound" class="text-button" type="button">▶ Test sound and speech</button>
-          <p class="setting-help">Audio works best while this page is open. Your browser may silence sounds in the background.</p>
-        </section>
-
-        <section class="control-card" aria-labelledby="displayHeading">
-          <div class="card-heading"><div><span class="eyebrow">MAKE IT YOURS</span><h2 id="displayHeading">Display</h2></div></div>
-          <div class="setting-row stacked"><span class="field-label">Timer colour</span><div class="color-choices" role="group" aria-label="Timer colour">
-            <button type="button" class="color-choice is-selected" data-color="coral" aria-label="Coral" aria-pressed="true" title="Coral"><span style="--swatch:#ff805e"></span></button>
-            <button type="button" class="color-choice" data-color="teal" aria-label="Teal" aria-pressed="false" title="Teal"><span style="--swatch:#43c2b3"></span></button>
-            <button type="button" class="color-choice" data-color="violet" aria-label="Violet" aria-pressed="false" title="Violet"><span style="--swatch:#a795ff"></span></button>
-            <button type="button" class="color-choice" data-color="gold" aria-label="Golden" aria-pressed="false" title="Golden"><span style="--swatch:#f4bc66"></span></button>
-          </div></div>
-          <label class="check-row"><input type="checkbox" id="highContrast"><span>Extra-high contrast</span></label>
-          <label class="check-row"><input type="checkbox" id="keepAwake" checked><span>Keep screen awake <small>(when supported)</small></span></label>
-        </section>
-      </aside>
+        </div>
+        <div class="control-block voice-block">
+          <h2>Spoken feedback</h2>
+          <p class="voice-note">Voice is on by default. The timer announces the time while you adjust it, when you start, and as time runs out.</p>
+          <div class="cadence" role="group" aria-label="How often the timer speaks">
+            <button type="button" data-cadence="frequent" aria-pressed="true">Often</button>
+            <button type="button" data-cadence="standard" aria-pressed="false">Every minute</button>
+            <button type="button" data-cadence="quiet" aria-pressed="false">Key moments</button>
+          </div>
+          <div class="voice-bottom">
+            <button id="testVoice" type="button">Test voice</button>
+            <button id="tonesToggle" type="button" aria-pressed="false">Tones off</button>
+          </div>
+        </div>
+      </section>
     </main>
-    <footer class="site-footer">No accounts, no tracking. Timer settings stay on this device. <span>Installable and offline-ready when hosted over HTTPS.</span></footer>
+    <footer>Keyboard: arrow keys adjust the ruler; Enter starts. Space pauses or resumes. Voice may be limited when the browser is in the background.</footer>
   </div>
   <div id="srAnnouncements" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div id="srUrgent" class="sr-only" role="alert" aria-live="assertive" aria-atomic="true"></div>
 </body>
 </html>

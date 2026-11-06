@@ -1,29 +1,46 @@
-# Visual Countdown — redesigned edition
+# Visual Countdown — accessible talking timer
 
-An improved version of MicroSwitchers' single-page visual/audio countdown timer.
+This is the low-vision and blindness-focused revision of MicroSwitchers' Visual Countdown app. It keeps the original **touch / drag / release** interaction, with speech as a primary feature instead of an optional settings panel.
 
-## Highlights
+## What people can do without opening a menu
 
-- Keeps the original **tap / drag the full-height vertical ruler, release to start** interaction.
-- **Accurate deadline-based timing** (using real elapsed time, not counting `setInterval` callbacks); time catches up after sleep or tab backgrounding.
-- **Pause, resume, restart, clear, and fullscreen** controls; 9 one-tap presets and custom duration (up to 120 minutes).
-- **Adaptable ruler scale** (5, 10, 15, 30, 60, 120 minutes). When a preset exceeds the scale, the scale expands automatically.
-- Optional **gentle audio, ticking, voice reminders, volume, mute, and finish chime**.
-- Responsive mobile-first layout, four bar colours, high-contrast mode, large time readout, keyboard controls, and live status updates for screen readers.
-- Saves timer state and preferences on-device; countdown survives a page reload.
-- No framework, CDN, fonts, analytics, or user accounts. Offline-capable PWA on HTTPS (including GitHub Pages).
+- **Touch the ruler:** the selected duration is spoken immediately. Slide your finger up or down and it announces changing durations as you move (throttled slightly so speech does not pile up). Release your finger to start the countdown, with spoken confirmation.
+- **Touch the ruler while a timer is already running or paused:** hear the remaining time. This DOES NOT reset the countdown.
+- **Press Hear time:** a large, always-visible button speaks the remaining or selected time on demand, even if automatic spoken updates are off.
+- **Press Start / Pause / Resume, Restart, or Clear:** distinct, large, always-visible controls, with spoken state changes.
+- **Press + 1 min / - 1 min:** accessible exact adjustments, with spoken confirmation, including while the countdown runs.
+- **Select a preset:** six one-tap 1–30-minute timers, or enter minutes and seconds for a custom duration up to two hours.
+- **Choose a voice cadence:** three plainly visible choices (Often, Every minute, Key moments); no nested audio/settings menus.
+- **Toggle Voice** from the top bar. Speech is **on by default** for new visitors. An optional Tones button adds simple cues and a finish chime.
+- **Change ruler range** with a visible cycling button; selected or active time is never truncated silently.
 
-## Deploy to GitHub Pages
+## Spoken countdown schedule
 
-Copy all contents into the root of `MicroSwitchers/audiocountdown` on the `main` branch, keeping the directory layout. GitHub Pages will then serve the improved app at the existing URL. You can test locally with any static web server (e.g. `python -m http.server 8000`) or open `index.html` directly for most features. Service workers require HTTPS or localhost.
+Every cadence speaks the last **10 seconds as single numbers** and announces *Time is up* on completion. Above that:
 
-## Notes
+- **Often (default):** every minute above 5 minutes; every 30 seconds from 5 to 1 minute; every 10 seconds during the final minute.
+- **Every minute:** each minute, plus 30 and 20 seconds.
+- **Key moments:** every 5 minutes, plus 60, 30 and 20 seconds.
 
-- Audio/speech require user interaction in many browsers; browser tabs in the background might mute or pause audio.
-- The Screen Wake Lock API is optional and may be unavailable on some mobile browsers.
-- Tap/dragging a running timer **starts a new timer**, like the original app; pause first if you only want to stop it.
-- Settings are private to the browser via `localStorage`. No data is sent anywhere.
+The app uses the browser's native `speechSynthesis` interface. Unlike recorded audio files, speech quality and timing vary by device, available voices, accessibility setup, and browser. A user gesture may be required to activate sound; background tabs may suspend or silence speech. The countdown **time itself** is deadline-based and catches up after sleep/backgrounding. The app cannot guarantee uninterrupted spoken reminders when the browser is not active; this should not be relied on as a safety-critical alarm.
 
-## Original interaction
+## Accessibility features
 
-The original app had a 60-minute vertical canvas ruler, touch/drag/release to start, spoken start/reminders/finish, and a beep each second. This version retains that interaction while adding accessible controls, a much clearer interface, and more reliable timing.
+- Dark, high-contrast timer background; warm filled progress bar; very large white countdown digits.
+- Large minimum-size touch targets and visible keyboard focus.
+- Semantic controls with descriptive accessible names and state (`aria-pressed`, `aria-valuetext`).
+- Keyboard: focus the ruler; arrow keys adjust, Home/End jump to limits, Enter/Space starts. The main button pauses/resumes. Tab navigates all controls.
+- Distinctive live-region announcements on actions and completion; time digits themselves do **not** act as a one-second live region. This limits excessive screen-reader chatter.
+- Screen readers (including VoiceOver and TalkBack) may reserve touch gestures for navigation. The accessible buttons and keyboard commands provide a non-drag alternative.
+- Visual and audio feedback provide redundant modalities; audio can be turned off when using a screen reader to avoid two simultaneous voices.
+- Offline-capable on HTTPS through a network-first service worker; optional screen wake lock where supported; no accounts, analytics, fonts, frameworks, or external network dependencies.
+
+## Test
+
+Run `node tests/smoke.cjs`. The dependency-free smoke test simulates spoken drag feedback, release-to-start, touch-to-hear while running, accurate elapsed time, time adjustment, pause/resume, final-second speech, finish, restart/clear, and voice-on/off behavior.
+
+**Browser/device QA is still necessary** before production use. In particular test speech synthesis and touch semantics on Android Chrome with TalkBack and iOS Safari with VoiceOver, and test portrait/landscape, installed-PWA mode, and screen wake-lock behavior. Browser rendering could not be exercised in the present build environment.
+
+## Deploy
+
+Place the app files in the root of `MicroSwitchers/audiocountdown` on `main` (or merge the review branch). GitHub Pages will serve the update at its current URL. Run a static server locally for PWA testing (`python -m http.server 8000`), or open the standalone HTML version for quick testing without an install. Offline caching via a service worker requires HTTPS or localhost.

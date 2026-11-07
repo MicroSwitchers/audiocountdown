@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="88" fill="#0a1120"/>
+<path d="M0 303h512v121q0 88-88 88H88q-88 0-88-88Z" fill="#164eaa"/>
+<rect y="298" width="512" height="7" fill="#fece45"/>
+<g fill="white" font-family="Arial,DejaVu Sans,sans-serif" font-weight="900" font-size="114" text-anchor="middle"><text x="268" y="273">15:00</text></g>
+<g stroke="white" stroke-width="7" stroke-linecap="square"><path d="M0 60h45M0 138h25M0 216h45M0 381h45M0 447h25"/></g>
+</svg>

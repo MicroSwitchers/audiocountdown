@@ -3,92 +3,103 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
-  <meta name="theme-color" content="#070b11">
-  <meta name="description" content="An edge-to-edge talking countdown timer. Drag to set, release to start; tap to hear the remaining time.">
+  <meta name="theme-color" content="#0a1120">
+  <meta name="description" content="A high-contrast full-screen talking timer. Tap to start, tap to hear, hold three seconds to clear.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Talking Visual Countdown</title>
   <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
   <link rel="manifest" href="./manifest.webmanifest">
   <style>
-    :root { color-scheme:dark; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#070b11; }
+    :root { color-scheme:dark; font-family: system-ui,-apple-system,"Segoe UI",Arial,sans-serif; background:#0a1120; --night:#0a1120; --blue:#164eaa; --white:#fff; --yellow:#fece45; }
     *,*::before,*::after { box-sizing:border-box; }
-    html,body { width:100%; height:100%; margin:0; padding:0; overflow:hidden; overscroll-behavior:none; }
-    body { color:#fff; }
-    button { font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-    button:focus-visible,#timer:focus-visible { outline:4px solid #fff; outline-offset:-5px; }
-    #app { position:fixed; inset:0; width:100%; height:100%; height:100dvh; overflow:hidden; background:#070b11; user-select:none; -webkit-user-select:none; }
-    #timer { position:absolute; inset:0; width:100%; height:100%; touch-action:none; cursor:crosshair; overflow:hidden; isolation:isolate; }
-    #fill { position:absolute; inset:auto 0 0; height:0; background:linear-gradient(0deg,#e24934 0%,#f08231 55%,#ffc04c 100%); z-index:0; transition:height .12s linear; pointer-events:none; }
-    #fill::after {content:"";position:absolute;top:0;left:0;right:0;height:2px;background:#fff9e3;box-shadow:0 0 10px #fff9e3;}
-    #tickmarks { position:absolute; inset:0 auto 0 0; width:96px; z-index:1; pointer-events:none; }
-    .tick { position:absolute; left:0; width:100%; height:0; color:#fff; transform:translateY(-50%); }
-    .tick::before { content:""; position:absolute;top:0;left:0;width:26px;border-top:2px solid rgba(255,255,255,.76); }
-    .tick.major::before { width:45px;border-top-width:3px; }
-    .tick span {position:absolute;left:51px;top:-10px;font-size:clamp(13px,1.55vw,18px);font-weight:850;letter-spacing:.01em;text-shadow:0 2px 5px #000, 0 0 4px #000;}
-    #center { position:absolute; z-index:2; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 clamp(24px,9vw,118px); pointer-events:none; text-align:center; text-shadow:0 2px 7px #020307,0 0 23px #020307; }
-    #center::before { content:""; position:absolute; z-index:-1; left:7%; right:7%; top:35%; bottom:32%; background:linear-gradient(90deg,transparent,rgba(3,8,14,.78) 20%,rgba(3,8,14,.8) 80%,transparent); filter:blur(10px); }
-    #phase {font-size:clamp(15px,1.7vw,24px);font-weight:900;letter-spacing:.19em;line-height:1.15;}
-    #digits {font-weight:900;letter-spacing:-.065em;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:clamp(76px,21vw,250px);line-height:1.18;}
-    #digits.long {font-size:clamp(54px,15vw,195px);}
-    #instructions { font-size:clamp(16px,2.2vw,26px);line-height:1.3;font-weight:700;max-width:700px;min-height:1.3em; }
-    #topControls { position:absolute;z-index:6;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));display:flex;gap:12px; }
-    .corner { min-width:56px;height:56px;padding:0 14px;border:2px solid rgba(255,255,255,.7);border-radius:15px;background:rgba(3,11,17,.82);color:#fff;font-size:25px;font-weight:850;display:grid;place-items:center; }
-    .corner[aria-pressed="false"] {opacity:.78;}
-    .corner svg {width:27px;height:27px;stroke:currentColor;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;fill:none;}
+    html,body { width:100%;height:100%;margin:0;padding:0;overflow:hidden;overscroll-behavior:none; }
+    body { color:var(--white); }
+    button { font:inherit; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+    button:focus-visible,#timer:focus-visible { outline:4px solid var(--yellow);outline-offset:-5px; }
+    #app { position:fixed;inset:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:var(--night);user-select:none;-webkit-user-select:none; }
+    #timer { position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:pointer;overflow:hidden;isolation:isolate; }
+    #fill { position:absolute;inset:auto 0 0;height:0;background:var(--blue);z-index:0;pointer-events:none; }
+    #fill::after { content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--yellow); }
+    #tickmarks {position:absolute;inset:0 auto 0 0;width:92px;z-index:1;pointer-events:none;}
+    .tick {position:absolute;left:0;width:100%;height:0;transform:translateY(-50%);}
+    .tick::before {content:"";position:absolute;top:0;left:0;width:17px;border-top:2px solid var(--white);}
+    .tick.major::before {width:31px;border-top-width:3px;}
+    .tick span {position:absolute;left:40px;top:-9px;font-size:clamp(12px,1.5vw,18px);font-weight:800;line-height:1;letter-spacing:0;}
+    #center {position:absolute;z-index:2;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 clamp(16px,6vw,110px);pointer-events:none;text-align:center;transform:translateY(-12px);}
+    #phase {font-size:clamp(15px,2.1vw,24px);font-weight:850;letter-spacing:.16em;line-height:1.2;}
+    #digits {font-family:Arial,"Segoe UI",sans-serif;font-weight:900;letter-spacing:-.055em;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:clamp(88px,20vw,240px);line-height:1.05;}
+    #digits.long {font-size:clamp(55px,13vw,175px);}
+    #instructions {font-size:clamp(16px,1.9vw,23px);line-height:1.35;font-weight:750;max-width:650px;min-height:1.35em;}
+    #topControls {position:absolute;z-index:6;right:max(14px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));display:flex;gap:8px;align-items:center;}
+    .corner {min-height:52px;border:2px solid #fff;background:var(--night);color:#fff;border-radius:8px;font-size:15px;font-weight:850;letter-spacing:.05em;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .corner svg {width:25px;height:25px;stroke:currentColor;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;fill:none;flex-shrink:0;}
     .speaker-off {display:none}
     #voiceControl[aria-pressed="false"] .speaker-on {display:none}
     #voiceControl[aria-pressed="false"] .speaker-off {display:block}
-    #status { position:absolute;z-index:2;top:max(23px,env(safe-area-inset-top));left:102px;max-width:calc(100% - 160px);font-size:clamp(13px,1.6vw,19px);font-weight:900;letter-spacing:.09em;text-shadow:0 2px 8px #000; }
-    #controls { position:absolute;z-index:6;left:50%;bottom:max(17px,calc(env(safe-area-inset-bottom) + 12px));width:min(660px,calc(100% - 32px));transform:translateX(-50%);display:grid;grid-template-columns:1.2fr 1.3fr .85fr;gap:10px; }
-    #controls.empty {grid-template-columns:1fr 1fr}
-    #resetControl[hidden]{display:none}
-    .control {min-height:68px;border-radius:17px;border:2px solid rgba(255,255,255,.85);background:rgba(4,14,22,.92);color:#fff;font-size:clamp(17px,2vw,24px);font-weight:850;line-height:1.15;padding:8px 11px; }
-    .control:disabled {opacity:.42;cursor:default;}
-    #mainControl {background:#fff;color:#08141b;border-color:#fff;}
-    #hearControl {background:rgba(4,42,52,.94);}
-    #resetControl {background:rgba(4,14,22,.75);}
+    #voiceControl[aria-pressed="false"] {background:#fff;color:var(--night);}
+    #fullscreenControl {width:52px;padding:0;}
+    #status {position:absolute;z-index:2;top:max(26px,env(safe-area-inset-top));left:80px;max-width:calc(100% - 260px);font-size:clamp(13px,1.6vw,18px);font-weight:900;letter-spacing:.12em;}
+    #controls {position:absolute;z-index:6;left:50%;bottom:max(20px,calc(env(safe-area-inset-bottom) + 14px));width:min(520px,calc(100% - 44px));transform:translateX(-50%);display:flex;justify-content:center;gap:10px;}
+    #controls.empty {width:min(360px,calc(100% - 44px));}
+    .control {min-height:62px;min-width:140px;flex:1;border:2px solid white;border-radius:8px;background:var(--night);color:white;font-size:clamp(17px,1.9vw,23px);font-weight:900;line-height:1.15;padding:8px 12px;}
+    #mainControl {background:#fff;color:var(--night);}
+    .control[hidden],#resetControl[hidden],#mainControl[hidden],#controls[hidden] {display:none!important;}
+    #resetControl:not([hidden]) {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+    #resetControl:not([hidden]):focus-visible {position:absolute;left:0;right:0;bottom:78px;width:100%;height:62px;clip-path:none;overflow:visible;margin:0;z-index:8;background:#fff;color:var(--night);border:4px solid var(--yellow);}
+    #holdNotice {position:absolute;z-index:7;left:50%;top:23%;transform:translateX(-50%);width:min(550px,calc(100% - 80px));padding:18px 22px;background:var(--yellow);color:var(--night);text-align:center;font-size:clamp(18px,2vw,25px);font-weight:900;line-height:1.25;letter-spacing:.02em;border:3px solid var(--night);pointer-events:none;}
+    #holdNotice[hidden] {display:none;}
+    #holdTrack {height:8px;background:var(--night);margin-top:13px;width:100%;}
+    #holdProgress {background:var(--blue);height:100%;width:0;}
     .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important;}
     #timer[data-phase="finished"] #fill {height:0!important;}
-    #timer[data-phase="finished"] #phase {color:#ffd06c;}
-    #timer[data-phase="paused"] #phase {color:#fff09f;}
-    @media (max-width:550px) {
-      #tickmarks{width:75px}.tick.major::before{width:32px}.tick span{left:37px;font-size:13px}.tick::before{width:18px}
-      #center{padding:0 15px}#digits{font-size:clamp(70px,22.5vw,110px)}#digits.long{font-size:clamp(47px,15.6vw,75px)}
-      #phase{font-size:13px}#instructions{font-size:15px;padding:0 20px}#controls{gap:7px;width:calc(100% - 18px)}
-      .control{min-height:69px;padding:8px 6px;font-size:16px;border-radius:12px}.corner{min-width:50px;height:50px;border-radius:12px;padding:0 10px}#topControls{gap:7px;right:9px;top:max(10px,env(safe-area-inset-top))}#status{top:max(23px,env(safe-area-inset-top));left:82px;font-size:13px}
+    #timer[data-phase="finished"] #phase {color:var(--yellow);}
+    @media(max-width:550px) {
+      #tickmarks{width:70px}.tick.major::before{width:26px}.tick span{left:33px;font-size:13px}.tick::before{width:12px}
+      #center{padding:0 8px 0 60px;transform:translateY(-10px)}#digits{font-size:clamp(90px,26vw,116px)}#digits.long{font-size:clamp(54px,16vw,82px)}
+      #phase{font-size:14px}#instructions{font-size:16px;max-width:310px;padding:0 12px}
+      .corner{min-height:48px;padding:0 9px;font-size:12px;gap:5px;border-radius:6px}.corner svg{width:21px;height:21px}
+      #fullscreenControl{width:48px}#topControls{top:max(10px,env(safe-area-inset-top));right:9px;gap:6px}
+      #status{left:67px;top:max(25px,env(safe-area-inset-top));font-size:12px;max-width:calc(100% - 205px)}
+      #controls{width:calc(100% - 35px);gap:8px}.control{min-height:62px;min-width:0;font-size:17px}
+      #holdNotice{width:calc(100% - 44px);padding:15px 14px;top:23%;}
     }
-    @media (orientation:landscape) and (max-height:550px) {
-      #center{transform:translateY(-8%)}#digits{font-size:clamp(62px,16vh,150px)}#digits.long{font-size:clamp(51px,13vh,100px)}#instructions{font-size:clamp(13px,3.4vh,20px)}#phase{font-size:clamp(12px,3vh,18px)}
-      .control{min-height:50px;font-size:16px}#controls{bottom:max(8px,env(safe-area-inset-bottom));width:min(630px,calc(100% - 170px));}#topControls{top:8px}.corner{min-width:44px;height:44px;font-size:20px}#status{font-size:13px}
+    @media(orientation:landscape) and (max-height:550px) {
+      #center{transform:translateY(-8px);gap:0}#digits{font-size:clamp(62px,21vh,132px)}#digits.long{font-size:clamp(51px,17vh,100px)}
+      #phase{font-size:clamp(12px,3vh,17px)}#instructions{font-size:clamp(13px,3.5vh,18px)}
+      #controls{bottom:max(7px,env(safe-area-inset-bottom));width:min(430px,calc(100% - 170px))}.control{min-height:48px;font-size:15px}
+      #topControls{top:8px}.corner{min-height:43px}#fullscreenControl{width:43px}#status{font-size:12px}
+      #holdNotice{top:16%;padding:10px 15px;}
     }
-    @media (prefers-reduced-motion:reduce){#fill{transition:none}}
+    @media(prefers-reduced-motion:reduce){#fill{transition:none}}
   </style>
 </head>
 <body>
   <main id="app">
-    <div id="timer" role="slider" tabindex="0" aria-label="Talking visual timer. Drag to set, or use arrow keys to adjust by one minute. Press Enter to start." aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" aria-valuetext="Timer ready. No time selected." aria-describedby="instructions" data-phase="ready">
+    <div id="timer" role="slider" tabindex="0" aria-label="Talking timer. Tap the vertical scale to start. Arrow keys adjust by one minute. Press Enter to start." aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" aria-valuetext="Timer ready. No time selected." aria-describedby="instructions" data-phase="ready">
       <div id="fill" aria-hidden="true"></div>
       <div id="tickmarks" aria-hidden="true"></div>
       <div id="status" aria-hidden="true">READY</div>
       <div id="center" aria-hidden="true">
-        <div id="phase">SET YOUR TIME</div>
+        <div id="phase">TAP TO SET TIME</div>
         <div id="digits">00:00</div>
-        <div id="instructions">Touch or drag to set · Release to start</div>
+        <div id="instructions">Tap a height to start · Hold 3 seconds to clear</div>
       </div>
     </div>
-    <div id="topControls" role="group" aria-label="Display and speech">
+    <div id="topControls" role="group" aria-label="Voice and full screen">
       <button type="button" class="corner" id="voiceControl" aria-label="Voice on. Tap to turn voice off" aria-pressed="true" title="Voice on">
         <svg class="speaker-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15 9a5 5 0 0 1 0 6M18 6a9 9 0 0 1 0 12"/></svg>
         <svg class="speaker-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4zM17 9l5 6m0-6-5 6"/></svg>
+        <span id="voiceLabel">VOICE ON</span>
       </button>
       <button type="button" class="corner" id="fullscreenControl" aria-label="Enter full screen" title="Full screen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg></button>
     </div>
     <div id="controls" class="empty" role="group" aria-label="Timer controls">
-      <button type="button" class="control" id="mainControl">Set time</button>
-      <button type="button" class="control" id="hearControl">Hear time</button>
-      <button type="button" class="control" id="resetControl" hidden>Reset</button>
+      <button type="button" class="control" id="mainControl" hidden>Pause</button>
+      <button type="button" class="control" id="hearControl">HEAR TIME</button>
+      <button type="button" class="control" id="resetControl" aria-label="Clear timer. Activate twice to confirm." hidden>Clear timer</button>
     </div>
+    <div id="holdNotice" role="status" hidden><span id="holdText">KEEP HOLDING 2 SECONDS TO CLEAR</span><div id="holdTrack" aria-hidden="true"><div id="holdProgress"></div></div></div>
     <div class="sr-only" id="announcement" role="status" aria-live="polite" aria-atomic="true"></div>
     <div class="sr-only" id="urgent" role="alert" aria-live="assertive" aria-atomic="true"></div>
   </main>
@@ -97,14 +108,17 @@
       'use strict';
       // No external JavaScript or CSS. The screen works offline as a single HTML file.
       const MAX_SECONDS = 3600;
-      const KEY = 'talking-visual-countdown-fullscreen-v4';
+      const KEY = 'talking-visual-countdown-fullscreen-v5';
+      const OLD_KEY = 'talking-visual-countdown-fullscreen-v4';
       const $ = id => document.getElementById(id);
       const stage=$('timer'),fill=$('fill'),ticks=$('tickmarks'),status=$('status');
       const phaseText=$('phase'),digits=$('digits'),instructions=$('instructions');
       const main=$('mainControl'),hear=$('hearControl'),reset=$('resetControl'),controls=$('controls');
-      const voiceControl=$('voiceControl'),fullscreenControl=$('fullscreenControl');
+      const voiceControl=$('voiceControl'),voiceLabel=$('voiceLabel'),fullscreenControl=$('fullscreenControl');
+      const holdNotice=$('holdNotice'),holdProgress=$('holdProgress'),holdText=$('holdText');
       const state={phase:'ready',durationMs:0,remainingMs:0,deadline:0,lastWholeSecond:-1};
       let speechOn=true,activePointer=null,previewPrevious=null,lastPreviewSpeech=0,lastPreviewValue=null;
+      let hold=null,clearConfirmUntil=0,clearFeedbackUntil=0;
       let audio=null,wakeLock=null,lastRendered=-1,liveMessage='',lastAnnouncement=0;
       const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,x));
       const seconds=()=>Math.ceil(Math.max(0,state.remainingMs)/1000);
@@ -114,51 +128,152 @@
       function words(s){s=Math.max(0,Math.ceil(s));if(!s)return 'zero seconds';const m=Math.floor(s/60),ss=s%60;return [m?`${m} ${m===1?'minute':'minutes'}`:'',ss?`${ss} ${ss===1?'second':'seconds'}`:''].filter(Boolean).join(' and ');}
       function announce(msg,urgent=false){const el=$(urgent?'urgent':'announcement');if(liveMessage===msg && Date.now()-lastAnnouncement<1000)return;liveMessage=msg;lastAnnouncement=Date.now();el.textContent='';requestAnimationFrame(()=>{el.textContent=msg;});}
       function unlock(){try{if(!audio){const C=window.AudioContext||window.webkitAudioContext;if(C)audio=new C();}if(audio?.state==='suspended')audio.resume().catch(()=>{});}catch(_){} }
-      function speak(msg,forced=false){if(!speechOn&&!forced)return false;if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return false;try{window.speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(msg);utter.rate=1.1;utter.volume=1;window.speechSynthesis.speak(utter);return true;}catch(_){return false;}}
-      function beep(freq=560,length=.06,volume=.028){if(!audio||audio.state!=='running')return;try{const t=audio.currentTime,osc=audio.createOscillator(),gain=audio.createGain();osc.type='sine';osc.frequency.value=freq;gain.gain.setValueAtTime(.001,t);gain.gain.linearRampToValueAtTime(volume,t+.006);gain.gain.exponentialRampToValueAtTime(.001,t+length);osc.connect(gain);gain.connect(audio.destination);osc.start(t);osc.stop(t+length+.01);osc.onended=()=>{osc.disconnect();gain.disconnect();};}catch(_){} }
+      function speak(msg){if(!speechOn)return false;if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return false;try{window.speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(msg);utter.rate=1.1;utter.volume=1;window.speechSynthesis.speak(utter);return true;}catch(_){return false;}}
+      function beep(freq=560,length=.06,volume=.028){if(!speechOn||!audio||audio.state!=='running')return;try{const t=audio.currentTime,osc=audio.createOscillator(),gain=audio.createGain();osc.type='sine';osc.frequency.value=freq;gain.gain.setValueAtTime(.001,t);gain.gain.linearRampToValueAtTime(volume,t+.006);gain.gain.exponentialRampToValueAtTime(.001,t+length);osc.connect(gain);gain.connect(audio.destination);osc.start(t);osc.stop(t+length+.01);osc.onended=()=>{osc.disconnect();gain.disconnect();};}catch(_){} }
       function finishBeep(){beep(660,.22,.11);setTimeout(()=>beep(820,.35,.11),230);}
       async function lockAwake(){if(wakeLock||state.phase!=='running'||document.visibilityState==='hidden'||!navigator.wakeLock)return;try{const w=await navigator.wakeLock.request('screen');wakeLock=w;w.addEventListener('release',()=>{if(wakeLock===w)wakeLock=null;},{once:true});if(state.phase!=='running')releaseAwake();}catch(_){}}
       function releaseAwake(){if(wakeLock){const w=wakeLock;wakeLock=null;w.release().catch(()=>{});}}
       function save(){try{localStorage.setItem(KEY,JSON.stringify({phase:state.phase,durationMs:state.durationMs,remainingMs:state.remainingMs,deadline:state.deadline,speechOn}));}catch(_){}}
-      function restore(){try{const o=JSON.parse(localStorage.getItem(KEY)||'null');if(!o)return;if(typeof o.speechOn==='boolean')speechOn=o.speechOn;const m=Number(o.remainingMs),d=Number(o.durationMs);if(!Number.isFinite(m)||!Number.isFinite(d)||m<0||d<0||m>3600000||d>3600000)return;if(!['ready','running','paused','finished'].includes(o.phase))return;state.durationMs=d;state.remainingMs=m;state.phase=o.phase;if(o.phase==='running'){const epoch=Number(o.deadline);if(!Number.isFinite(epoch))return;state.deadline=epoch;state.remainingMs=Math.max(0,epoch-Date.now());if(state.remainingMs<=0)state.phase='finished';}state.lastWholeSecond=seconds();}catch(_){}}
+      function restore(){try{const o=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(OLD_KEY)||'null');if(!o)return;if(typeof o.speechOn==='boolean')speechOn=o.speechOn;const m=Number(o.remainingMs),d=Number(o.durationMs);if(!Number.isFinite(m)||!Number.isFinite(d)||m<0||d<0||m>3600000||d>3600000)return;if(!['ready','running','paused','finished'].includes(o.phase))return;state.durationMs=d;state.remainingMs=m;state.phase=o.phase;if(o.phase==='running'){const epoch=Number(o.deadline);if(!Number.isFinite(epoch))return;state.deadline=epoch;state.remainingMs=Math.max(0,epoch-Date.now());if(state.remainingMs<=0)state.phase='finished';}state.lastWholeSecond=seconds();}catch(_){}}
       function getSetting(clientY){const box=stage.getBoundingClientRect();const p=clamp(1-(clientY-box.top)/box.height,0,1);const step=15;return clamp(Math.round(MAX_SECONDS*p/step)*step,0,MAX_SECONDS);}
       function stageTicks(){for(let s=0;s<=MAX_SECONDS;s+=60){const item=document.createElement('div');item.className='tick'+(s%300===0?' major':'');item.style.top=`${clamp(100-(s/MAX_SECONDS)*100,1,99)}%`;if(s%300===0){const label=document.createElement('span');label.textContent=String(s/60);item.appendChild(label);}ticks.appendChild(item);}}
       function render(force=false){const s=seconds();if(!force&&s===lastRendered)return;lastRendered=s;stage.dataset.phase=state.phase;fill.style.height=`${clamp(state.remainingMs/MAX_SECONDS/1000*100,0,100)}%`;
-        const labels={ready:'SET YOUR TIME',setting:'RELEASE TO START',running:'TIME REMAINING',paused:'PAUSED',finished:'TIME IS UP'};
+        const labels={ready:'TAP TO SET TIME',setting:'RELEASE TO START',running:'TIME REMAINING',paused:'PAUSED',finished:'TIME IS UP'};
         status.textContent={ready:'READY',setting:'SETTING',running:'RUNNING',paused:'PAUSED',finished:'FINISHED'}[state.phase];phaseText.textContent=labels[state.phase];digits.textContent=formatDigital(s);digits.classList.toggle('long',s>=3600);
-        instructions.textContent=state.phase==='running'?'Tap the timer to hear time remaining':state.phase==='paused'?'Tap to hear time · Resume below':state.phase==='finished'?'Touch to start a new timer':state.phase==='setting'?'Release to start the countdown':'Touch or drag to set · Release to start';
+        instructions.textContent=Date.now()<clearFeedbackUntil?'TIMER CLEARED':state.phase==='running'?'Tap to hear · Hold to clear':state.phase==='paused'?'Tap to hear · Hold to clear':state.phase==='finished'?'Tap to start another timer':state.phase==='setting'?'Release to start':'Tap a height to start';
         const v=`${words(s)}. ${state.phase==='running'?'Remaining':state.phase==='paused'?'Paused':state.phase==='finished'?'Time is up':state.phase==='setting'?'Selecting':'Selected'}.`;
         stage.setAttribute('aria-valuenow',String(Math.ceil(s/60)));stage.setAttribute('aria-valuetext',v);
         stage.setAttribute('aria-readonly',String(isActive()));
-        main.textContent=state.phase==='running'?'Pause':state.phase==='paused'?'Resume':state.phase==='finished'?'Again':(s===0?'Set time':'Start');main.disabled=state.phase==='setting';
-        reset.hidden=state.phase==='ready'&&s===0;controls.classList.toggle('empty',reset.hidden);
+        main.textContent=state.phase==='running'?'PAUSE':state.phase==='paused'?'RESUME':state.phase==='finished'?'AGAIN':'START';main.hidden=state.phase==='ready'&&s===0;main.disabled=state.phase==='setting';
+        reset.hidden=state.phase==='ready'&&s===0;hear.hidden=state.phase==='ready'&&s===0;controls.hidden=main.hidden&&hear.hidden;controls.classList.toggle('empty',main.hidden);
       }
       function start(s,feedback=true){s=Math.round(Number(s));if(!Number.isFinite(s)||s<1||s>MAX_SECONDS)return;unlock();state.phase='running';state.durationMs=s*1000;state.remainingMs=s*1000;state.deadline=Date.now()+state.remainingMs;state.lastWholeSecond=s;lastRendered=-1;if(feedback){const msg=`${words(s)}. Countdown started.`;speak(msg);announce(msg);}render(true);save();lockAwake();}
       function pause(){if(state.phase!=='running')return;state.remainingMs=remaining();if(state.remainingMs<=0)return finish();state.phase='paused';releaseAwake();const msg=`Paused. ${words(seconds())} remaining.`;speak(msg);announce(msg);render(true);save();}
       function resume(){if(state.phase!=='paused')return;unlock();state.phase='running';state.deadline=Date.now()+state.remainingMs;state.lastWholeSecond=seconds();const msg=`Resumed. ${words(seconds())} remaining.`;speak(msg);announce(msg);render(true);save();lockAwake();}
       function finish(audible=true){if(state.phase==='finished')return;state.phase='finished';state.remainingMs=0;state.deadline=0;releaseAwake();if(audible){finishBeep();speak('Time is up.');}announce('Time is up.',true);render(true);save();}
-      function clear(){releaseAwake();state.phase='ready';state.remainingMs=0;state.durationMs=0;state.deadline=0;state.lastWholeSecond=0;const msg='Timer cleared.';speak(msg);announce(msg);render(true);save();}
-      function speakTime(){unlock();const s=Math.ceil(remaining()/1000);const msg=state.phase==='finished'?'Time is up.':state.phase==='running'?`${words(s)} remaining.`:state.phase==='paused'?`Paused. ${words(s)} remaining.`:s>0?`${words(s)} selected. Press Start to begin.`:'Timer ready. Touch or drag anywhere on the screen to set a countdown.';speak(msg,true);announce(msg);}
+      function clear(){cancelHold();clearConfirmUntil=0;releaseAwake();state.phase='ready';state.remainingMs=0;state.durationMs=0;state.deadline=0;state.lastWholeSecond=0;const msg='Timer cleared.';clearFeedbackUntil=Date.now()+2600;speak(msg);announce(msg,true);render(true);save();setTimeout(()=>{if(state.phase==='ready'&&Date.now()>=clearFeedbackUntil)render(true);},2700);}
+      function speakTime(){unlock();const s=Math.ceil(remaining()/1000);const msg=state.phase==='finished'?'Time is up.':state.phase==='running'?`${words(s)} remaining.`:state.phase==='paused'?`Paused. ${words(s)} remaining.`:s>0?`${words(s)} selected. Press Start to begin.`:'Timer ready. Tap the screen to start a countdown.';speak(msg);announce(msg);}
       function toggle(){unlock();if(state.phase==='running')pause();else if(state.phase==='paused')resume();else if(state.phase==='finished'&&state.durationMs>0)start(state.durationMs/1000);else if(state.phase==='ready'&&seconds()>0)start(seconds());else speakTime();}
       function ready(s){s=clamp(Math.round(s),0,MAX_SECONDS);state.phase='ready';state.remainingMs=s*1000;state.durationMs=s*1000;state.deadline=0;render(true);const msg=`${words(s)} selected.`;speak(msg);announce(msg);save();}
       function preview(s){if(state.phase==='setting'&&s===seconds())return;state.phase='setting';state.remainingMs=s*1000;state.durationMs=s*1000;state.deadline=0;render(true);const now=performance.now();const substantial=lastPreviewValue===null||Math.abs(s-lastPreviewValue)>=15;if(substantial&&(lastPreviewValue===null||now-lastPreviewSpeech>=500)){lastPreviewSpeech=now;lastPreviewValue=s;speak(words(s));}}
       function scheduledCue(s){if(s<=10)return s>=1;return s===30||s===60||s%60===0;}
       function pulse(){if(state.phase!=='running')return;const old=state.lastWholeSecond;state.remainingMs=remaining();const current=seconds();if(current!==old){state.lastWholeSecond=current;render(true);if(current<=0){finish();return;}if(document.visibilityState!=='hidden'&&old-current===1){beep(current<=10?780:490,.045,current<=10?.06:.017);if(scheduledCue(current)){const msg=current<=10?String(current):`${words(current)} remaining`;speak(msg);if(current===10||current===30||current===60)announce(`${words(current)} remaining`);}}}else{fill.style.height=`${clamp(state.remainingMs/MAX_SECONDS/1000*100,0,100)}%`;}}
-      stage.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;e.preventDefault();unlock();if(isActive()){speakTime();return;}previewPrevious={phase:state.phase,durationMs:state.durationMs,remainingMs:state.remainingMs};activePointer=e.pointerId;lastPreviewSpeech=0;lastPreviewValue=null;try{stage.setPointerCapture(e.pointerId);}catch(_){}preview(getSetting(e.clientY));});
-      stage.addEventListener('pointermove',e=>{if(activePointer!==e.pointerId||state.phase!=='setting')return;e.preventDefault();preview(getSetting(e.clientY));});
-      stage.addEventListener('pointerup',e=>{if(activePointer!==e.pointerId)return;e.preventDefault();activePointer=null;const s=seconds();if(s>0)start(s);else clear();});
-      stage.addEventListener('pointercancel',e=>{if(activePointer!==e.pointerId)return;activePointer=null;if(previewPrevious){Object.assign(state,previewPrevious);state.deadline=0;}else{state.phase='ready';state.remainingMs=0;}render(true);save();});
-      // Screen-reader double-tap can dispatch a click without pointer coordinates. Never start a random time from it.
+      // One tap sets and starts the timer. During a countdown, a tap speaks remaining time.
+      // A continuous 3-second press clears, with a spoken warning at 1 second.
+      function cancelHold(){
+        if(!hold)return;
+        clearTimeout(hold.warningTimer);clearTimeout(hold.clearTimer);clearInterval(hold.progressTimer);
+        hold=null;holdNotice.hidden=true;holdProgress.style.width='0%';
+      }
+      function longPressStart(e){
+        hold={id:e.pointerId,x:e.clientX,y:e.clientY,warned:false,cleared:false,warningTimer:null,clearTimer:null,progressTimer:null};
+        const h=hold;
+        h.warningTimer=setTimeout(()=>{
+          if(hold!==h)return;
+          h.warned=true;holdText.textContent='KEEP HOLDING 2 SECONDS TO CLEAR';
+          holdNotice.hidden=false;holdProgress.style.width='0%';
+          const warning='Keep holding for two more seconds to clear the timer.';
+          speak(warning);announce(warning,true);
+          const start=performance.now();
+          h.progressTimer=setInterval(()=>{if(hold!==h)return;holdProgress.style.width=`${clamp((performance.now()-start)/2000*100,0,100)}%`;},40);
+        },1000);
+        h.clearTimer=setTimeout(()=>{
+          if(hold!==h)return;
+          h.cleared=true;
+          clear();
+        },3000);
+      }
+      stage.addEventListener('pointerdown',e=>{
+        if(e.pointerType==='mouse'&&e.button!==0)return;
+        if(activePointer!==null||hold)return;
+        e.preventDefault();unlock();
+        try{stage.setPointerCapture(e.pointerId);}catch(_){}
+        activePointer=e.pointerId;
+        if(isActive()||state.phase==='finished'){
+          longPressStart(e);
+        }else{
+          previewPrevious={phase:state.phase,durationMs:state.durationMs,remainingMs:state.remainingMs};
+          lastPreviewSpeech=0;lastPreviewValue=null;preview(getSetting(e.clientY));
+        }
+      });
+      stage.addEventListener('pointermove',e=>{
+        if(activePointer!==e.pointerId)return;
+        if(hold){
+          if(Math.hypot(e.clientX-hold.x,e.clientY-hold.y)>28){
+            const warned=hold.warned;cancelHold();if(warned)announce('Clear cancelled.');
+          }
+          return;
+        }
+        if(state.phase==='setting'){e.preventDefault();preview(getSetting(e.clientY));}
+      });
+      stage.addEventListener('pointerup',e=>{
+        if(activePointer!==e.pointerId)return;
+        e.preventDefault();activePointer=null;
+        if(hold){
+          const warned=hold.warned;const cleared=hold.cleared;
+          cancelHold();
+          if(!cleared){
+            if(warned){speak('Clear cancelled.');announce('Clear cancelled.');}
+            else if(state.phase==='finished'){const s=getSetting(e.clientY);if(s>0)start(s);else speakTime();}
+            else speakTime();
+          }
+          return;
+        }
+        if(state.phase==='setting'){
+          const s=seconds();
+          if(s>0)start(s);
+          else {state.phase='ready';state.remainingMs=0;render(true);save();speakTime();}
+        }
+      });
+      stage.addEventListener('pointercancel',e=>{
+        if(activePointer!==e.pointerId)return;
+        activePointer=null;
+        if(hold){const warned=hold.warned;cancelHold();if(warned){speak('Clear cancelled.');announce('Clear cancelled.');}return;}
+        if(previewPrevious){Object.assign(state,previewPrevious);state.deadline=0;}
+        else{state.phase='ready';state.remainingMs=0;}
+        render(true);save();
+      });
+      // Screen readers may activate a slider via a synthesized click without pointer coordinates.
       stage.addEventListener('click',e=>{if(e.detail===0)speakTime();});
-      stage.addEventListener('keydown',e=>{if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End','Enter',' '].includes(e.key))return;e.preventDefault();unlock();if(e.key==='Enter'||e.key===' '){toggle();return;}if(isActive()){speakTime();return;}const step=e.shiftKey?300:60;let s=seconds();if(e.key==='Home')s=0;else if(e.key==='End')s=MAX_SECONDS;else s+=['ArrowUp','ArrowRight'].includes(e.key)?step:-step;ready(s);});
-      main.addEventListener('click',toggle);hear.addEventListener('click',speakTime);reset.addEventListener('click',clear);
-      voiceControl.addEventListener('click',()=>{unlock();if(speechOn){speak('Voice off.');speechOn=false;}else{speechOn=true;speak('Voice on.');}voiceControl.setAttribute('aria-pressed',String(speechOn));voiceControl.setAttribute('aria-label',speechOn?'Voice on. Tap to turn voice off':'Voice off. Tap to turn voice on');voiceControl.title=speechOn?'Voice on':'Voice off';announce(speechOn?'Voice on':'Voice off');save();});
+      stage.addEventListener('keydown',e=>{
+        if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End','Enter',' '].includes(e.key))return;
+        e.preventDefault();unlock();
+        if(e.key==='Enter'||e.key===' '){toggle();return;}
+        if(isActive()){speakTime();return;}
+        const step=e.shiftKey?300:60;let s=seconds();
+        if(e.key==='Home')s=0;else if(e.key==='End')s=MAX_SECONDS;
+        else s+=['ArrowUp','ArrowRight'].includes(e.key)?step:-step;
+        ready(s);
+      });
+      main.addEventListener('click',toggle);
+      hear.addEventListener('click',speakTime);
+      // Native keyboard/screen-reader fallback for users whose assistive touch gestures capture long presses.
+      reset.addEventListener('click',()=>{
+        if(Date.now()<clearConfirmUntil){clear();return;}
+        clearConfirmUntil=Date.now()+5000;
+        const warning='Clear timer? Activate Clear timer again to confirm.';
+        speak(warning);announce(warning,true);
+      });
+      function refreshVoice(){
+        voiceControl.setAttribute('aria-pressed',String(speechOn));
+        voiceControl.setAttribute('aria-label',speechOn?'Voice on. Tap to turn voice off':'Voice off. Tap to turn voice on');
+        voiceControl.title=speechOn?'Voice on':'Voice off';
+        voiceLabel.textContent=speechOn?'VOICE ON':'VOICE OFF';
+      }
+      voiceControl.addEventListener('click',()=>{
+        unlock();
+        speechOn=!speechOn;
+        if(!speechOn){try{window.speechSynthesis?.cancel();}catch(_){} }
+        refreshVoice();
+        if(speechOn)speak('Voice on.');
+        announce(speechOn?'Voice on.':'Voice off.');save();
+      });
       fullscreenControl.addEventListener('click',()=>{const target=$('app');if(document.fullscreenElement){document.exitFullscreen?.().catch(()=>{});}else if(target.requestFullscreen){target.requestFullscreen().catch(()=>announce('Your browser does not permit full screen mode.'));}else{announce('Full screen is available when the app is installed.');}});
       document.addEventListener('fullscreenchange',()=>fullscreenControl.setAttribute('aria-label',document.fullscreenElement?'Exit full screen':'Enter full screen'));
       document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){releaseAwake();save();}else if(state.phase==='running'){state.remainingMs=remaining();state.lastWholeSecond=seconds();if(state.remainingMs<=0)finish(false);else lockAwake();render(true);}});
       window.addEventListener('pagehide',save);
       window.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();toggle();}});
-      stageTicks();restore();voiceControl.setAttribute('aria-pressed',String(speechOn));voiceControl.setAttribute('aria-label',speechOn?'Voice on. Tap to turn voice off':'Voice off. Tap to turn voice on');render(true);
+      stageTicks();restore();refreshVoice();render(true);
       setInterval(pulse,100);
       // Refresh offline assets automatically when a new version is deployed.
       if('serviceWorker'in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').then(r=>r.update()).catch(()=>{}));

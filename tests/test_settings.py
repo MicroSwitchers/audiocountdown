@@ -56,9 +56,9 @@ def run():
    # Speech setting 'off' mutes, manual mode permits requested speech.
    page.locator('input[name="speechMode"][value="off"]').check()
    assert page.locator('#voiceControl').count()==0
-   assert page.evaluate("JSON.parse(localStorage.getItem('talking-visual-countdown-fullscreen-v7')).prefs.speechMode")=='off'
+   assert page.evaluate("JSON.parse(localStorage.getItem('talking-visual-countdown-fullscreen-v8')).prefs.speechMode")=='off'
    page.locator('input[name="speechMode"][value="manual"]').check()
-   assert page.evaluate("JSON.parse(localStorage.getItem('talking-visual-countdown-fullscreen-v7')).prefs.speechMode")=='manual'
+   assert page.evaluate("JSON.parse(localStorage.getItem('talking-visual-countdown-fullscreen-v8')).prefs.speechMode")=='manual'
    # Keep screen awake setting persists; wake lock only starts once countdown is running.
    page.locator('#wakeToggle').check()
    assert page.locator('#wakeStatus').inner_text().startswith('On.')

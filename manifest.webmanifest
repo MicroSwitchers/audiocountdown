@@ -2,10 +2,14 @@
   "id": "./",
   "name": "Talking Visual Countdown",
   "short_name": "Talking Timer",
-  "description": "A tap-first, high-contrast, full-screen countdown with spoken time feedback and hold-to-clear confirmation.",
+  "description": "An accessible full-screen talking countdown with adjustable ruler ranges, colour themes, and offline support.",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ],
   "orientation": "any",
   "background_color": "#0a1120",
   "theme_color": "#0a1120",
@@ -14,13 +18,25 @@
       "src": "./icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "./icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

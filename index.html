@@ -72,6 +72,48 @@
       #holdNotice{top:16%;padding:10px 15px;}
     }
     @media(prefers-reduced-motion:reduce){#fill{transition:none}}
+
+    /* Settings is a temporary overlay, never part of the countdown layout. */
+    #settingsControl {width:52px;padding:0;}
+    #settingsShade[hidden],#settingsDrawer[hidden] {display:none!important;}
+    #settingsShade {position:fixed;inset:0;z-index:20;background:#000b;}
+    #settingsDrawer {position:fixed;z-index:21;right:0;top:0;bottom:0;width:min(450px,100%);height:100%;height:100dvh;background:var(--night);color:var(--white);border-left:3px solid var(--yellow);overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;padding:20px max(20px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom));user-select:text;-webkit-user-select:text;}
+    .settingsHead {display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px;}
+    #settingsTitle {margin:0;font-size:clamp(25px,6vw,32px);letter-spacing:.02em;}
+    #closeSettings {min-width:100px;min-height:52px;border:2px solid var(--white);background:var(--white);color:var(--night);font-weight:900;border-radius:7px;}
+    .settingsGroup {margin:0 0 22px;border:0;border-top:2px solid var(--white);padding:13px 0 0;min-width:0;}
+    .settingsGroup legend {font-size:21px;font-weight:900;padding:0 8px 0 0;}
+    .settingHint {margin:3px 0 13px;line-height:1.35;font-size:15px;opacity:.95;}
+    .choices {display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+    .choices.speechChoices {grid-template-columns:1fr;}
+    .choice {position:relative;display:flex;align-items:center;gap:10px;min-height:58px;padding:11px 12px;border:2px solid var(--white);border-radius:7px;background:var(--night);font-weight:750;line-height:1.2;cursor:pointer;}
+    .choice:has(input:checked) {background:var(--yellow);color:var(--night);border-color:var(--yellow);}
+    .choice:focus-within {outline:3px solid var(--yellow);outline-offset:2px;}
+    .choice input {width:20px;height:20px;accent-color:var(--night);flex:none;}
+    .choice span {flex:1;}
+    .swatch {display:inline-flex!important;flex:0 0 44px!important;height:27px;gap:0;border:2px solid currentColor;overflow:hidden;}
+    .swatch i {display:block;width:50%;height:100%;}
+    .wakeRow {display:flex;align-items:center;gap:15px;min-height:62px;padding:12px;border:2px solid var(--white);border-radius:7px;font-size:20px;font-weight:850;cursor:pointer;}
+    #wakeToggle {width:29px;height:29px;accent-color:var(--yellow);flex-shrink:0;}
+    #wakeStatus,#updateStatus,#installStatus {font-size:15px;line-height:1.4;margin:10px 0;}
+    .settingsAction {min-height:51px;background:var(--white);color:var(--night);border:2px solid var(--white);padding:9px 16px;border-radius:7px;font-size:17px;font-weight:850;}
+    .settingsAction[hidden] {display:none!important;}
+    #installAction,#applyUpdate {margin:0 8px 8px 0;}
+    #settingsDrawer button:focus-visible {outline:4px solid var(--yellow);outline-offset:2px;}
+    #settingsControl svg {width:25px;height:25px;}
+    @media(max-width:550px) {
+      #settingsControl{width:48px;}
+      #topControls{gap:5px;}
+      #status{top:max(82px,calc(env(safe-area-inset-top) + 71px));left:68px;max-width:calc(100% - 80px);}
+      #digits.extra-long{font-size:clamp(40px,11.4vw,56px);}
+    }
+    @media(orientation:landscape) and (max-height:550px) {
+      #settingsControl{width:43px;}
+      #status{top:9px;left:73px;max-width:calc(100% - 300px);}
+      #digits.extra-long{font-size:clamp(42px,12vh,80px);}
+      #settingsDrawer{padding-top:10px;}
+    }
+    @media(min-width:551px) {#digits.extra-long{font-size:clamp(65px,12vw,165px);}}
   </style>
 </head>
 <body>
@@ -93,6 +135,7 @@
         <span id="voiceLabel">VOICE ON</span>
       </button>
       <button type="button" class="corner" id="fullscreenControl" aria-label="Enter full screen" title="Full screen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg></button>
+      <button type="button" class="corner" id="settingsControl" aria-label="Settings" aria-haspopup="dialog" aria-controls="settingsDrawer" aria-expanded="false" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a2 2 0 0 0-2 2v.18a2 2 0 0 1-3 1.73l-.16-.1a2 2 0 0 0-2.73.73l-1 1.73a2 2 0 0 0 .73 2.73l.16.09a2 2 0 0 1 0 3.46l-.16.09a2 2 0 0 0-.73 2.73l1 1.73a2 2 0 0 0 2.73.73l.16-.09a2 2 0 0 1 3 1.73V22h4v-.18a2 2 0 0 1 3-1.73l.16.09a2 2 0 0 0 2.73-.73l1-1.73a2 2 0 0 0-.73-2.73l-.16-.09a2 2 0 0 1 0-3.46l.16-.09a2 2 0 0 0 .73-2.73l-1-1.73a2 2 0 0 0-2.73-.73l-.16.09a2 2 0 0 1-3-1.73V2Z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </div>
     <div id="controls" class="empty" role="group" aria-label="Timer controls">
       <button type="button" class="control" id="mainControl" hidden>Pause</button>
@@ -100,6 +143,54 @@
       <button type="button" class="control" id="resetControl" aria-label="Clear timer. Activate twice to confirm." hidden>Clear timer</button>
     </div>
     <div id="holdNotice" role="status" hidden><span id="holdText">KEEP HOLDING 2 SECONDS TO CLEAR</span><div id="holdTrack" aria-hidden="true"><div id="holdProgress"></div></div></div>
+
+    <div id="settingsShade" hidden></div>
+    <aside id="settingsDrawer" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+      <div class="settingsHead"><h1 id="settingsTitle">Settings</h1><button type="button" id="closeSettings">CLOSE ✕</button></div>
+      <fieldset class="settingsGroup"><legend>Spoken feedback</legend>
+        <p class="settingHint">Tap the timer to hear the remaining time. Choose how often it announces automatically.</p>
+        <div class="choices speechChoices" id="speechChoices">
+          <label class="choice"><input type="radio" name="speechMode" value="off"><span>Voice off — completely silent</span></label>
+          <label class="choice"><input type="radio" name="speechMode" value="manual"><span>Only when I tap</span></label>
+          <label class="choice"><input type="radio" name="speechMode" value="milestones"><span>Key moments</span></label>
+          <label class="choice"><input type="radio" name="speechMode" value="five"><span>Every 5 minutes</span></label>
+          <label class="choice"><input type="radio" name="speechMode" value="minute"><span>Every minute</span></label>
+          <label class="choice"><input type="radio" name="speechMode" value="thirty"><span>Every 30 seconds</span></label>
+          <label class="choice"><input type="radio" name="speechMode" value="fifteen"><span>Every 15 seconds</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="settingsGroup"><legend>Timer ruler</legend>
+        <p class="settingHint">This changes the full height of the timer scale, not the duration of a running countdown.</p>
+        <div class="choices" id="scaleChoices">
+          <label class="choice"><input type="radio" name="scaleHours" value="1"><span>1 hour</span></label>
+          <label class="choice"><input type="radio" name="scaleHours" value="5"><span>5 hours</span></label>
+          <label class="choice"><input type="radio" name="scaleHours" value="12"><span>12 hours</span></label>
+          <label class="choice"><input type="radio" name="scaleHours" value="24"><span>24 hours</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="settingsGroup"><legend>High-contrast colours</legend>
+        <p class="settingHint">Solid colour combinations with large white numerals.</p>
+        <div class="choices" id="paletteChoices">
+          <label class="choice"><input type="radio" name="palette" value="blue"><span>Blue &amp; yellow</span><span class="swatch" aria-hidden="true"><i style="background:#0a1120"></i><i style="background:#164eaa"></i></span></label>
+          <label class="choice"><input type="radio" name="palette" value="gold"><span>Black &amp; gold</span><span class="swatch" aria-hidden="true"><i style="background:#060606"></i><i style="background:#996200"></i></span></label>
+          <label class="choice"><input type="radio" name="palette" value="cyan"><span>Dark &amp; cyan</span><span class="swatch" aria-hidden="true"><i style="background:#08141a"></i><i style="background:#006b72"></i></span></label>
+          <label class="choice"><input type="radio" name="palette" value="mono"><span>Black &amp; white</span><span class="swatch" aria-hidden="true"><i style="background:#050505"></i><i style="background:#595959"></i></span></label>
+        </div>
+      </fieldset>
+      <fieldset class="settingsGroup"><legend>Keep screen on</legend>
+        <label class="wakeRow"><input id="wakeToggle" type="checkbox"><span>Keep screen awake while the countdown runs</span></label>
+        <p id="wakeStatus" role="status">Off. The device may dim or lock normally.</p>
+        <p class="settingHint">Uses your browser's screen wake lock where supported. Battery saver or device settings can override it.</p>
+      </fieldset>
+      <fieldset class="settingsGroup"><legend>Install &amp; updates</legend>
+        <p class="settingHint">The timer works offline after its first successful installation. Countdown state and preferences are saved on this device.</p>
+        <button type="button" class="settingsAction" id="installAction" hidden>INSTALL APP</button>
+        <p id="installStatus">Use your browser's Add to Home Screen action to install.</p>
+        <button type="button" class="settingsAction" id="updateAction">CHECK FOR UPDATES</button>
+        <button type="button" class="settingsAction" id="applyUpdate" hidden>INSTALL READY UPDATE</button>
+        <p id="updateStatus" role="status">App ready.</p>
+      </fieldset>
+    </aside>
     <div class="sr-only" id="announcement" role="status" aria-live="polite" aria-atomic="true"></div>
     <div class="sr-only" id="urgent" role="alert" aria-live="assertive" aria-atomic="true"></div>
   </main>
@@ -107,15 +198,23 @@
     (() => {
       'use strict';
       // No external JavaScript or CSS. The screen works offline as a single HTML file.
-      const MAX_SECONDS = 3600;
-      const KEY = 'talking-visual-countdown-fullscreen-v5';
-      const OLD_KEY = 'talking-visual-countdown-fullscreen-v4';
+      let MAX_SECONDS = 3600;
+      const PALETTES={blue:{night:'#0a1120',blue:'#164eaa',yellow:'#fece45'},gold:{night:'#060606',blue:'#996200',yellow:'#ffe05c'},cyan:{night:'#08141a',blue:'#006b72',yellow:'#8bfffb'},mono:{night:'#050505',blue:'#595959',yellow:'#ffffff'}};
+      const MODES=['off','manual','milestones','five','minute','thirty','fifteen'];
+      const SCALES=[1,5,12,24];
+      let prefs={scaleHours:1,speechMode:'minute',palette:'blue',keepAwake:false},lastSpokenMode='minute';
+      const KEY = 'talking-visual-countdown-fullscreen-v6';
+      const OLD_KEY = 'talking-visual-countdown-fullscreen-v5';
+      const LEGACY_KEY='talking-visual-countdown-fullscreen-v4';
       const $ = id => document.getElementById(id);
       const stage=$('timer'),fill=$('fill'),ticks=$('tickmarks'),status=$('status');
       const phaseText=$('phase'),digits=$('digits'),instructions=$('instructions');
       const main=$('mainControl'),hear=$('hearControl'),reset=$('resetControl'),controls=$('controls');
       const voiceControl=$('voiceControl'),voiceLabel=$('voiceLabel'),fullscreenControl=$('fullscreenControl');
       const holdNotice=$('holdNotice'),holdProgress=$('holdProgress'),holdText=$('holdText');
+      const settingsControl=$('settingsControl'),settingsDrawer=$('settingsDrawer'),settingsShade=$('settingsShade'),closeSettings=$('closeSettings');
+      const wakeToggle=$('wakeToggle'),wakeStatus=$('wakeStatus'),updateStatus=$('updateStatus'),updateAction=$('updateAction'),applyUpdate=$('applyUpdate'),installAction=$('installAction'),installStatus=$('installStatus');
+      let wakePending=false,serviceRegistration=null,updateWaiting=null,reloadingForUpdate=false,deferredInstallPrompt=null;
       const state={phase:'ready',durationMs:0,remainingMs:0,deadline:0,lastWholeSecond:-1};
       let speechOn=true,activePointer=null,previewPrevious=null,lastPreviewSpeech=0,lastPreviewValue=null;
       let hold=null,clearConfirmUntil=0,clearFeedbackUntil=0;
@@ -125,21 +224,71 @@
       const remaining=()=>state.phase==='running'?Math.max(0,state.deadline-Date.now()):state.remainingMs;
       const isActive=()=>state.phase==='running'||state.phase==='paused';
       function formatDigital(s){s=Math.max(0,Math.ceil(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;}
-      function words(s){s=Math.max(0,Math.ceil(s));if(!s)return 'zero seconds';const m=Math.floor(s/60),ss=s%60;return [m?`${m} ${m===1?'minute':'minutes'}`:'',ss?`${ss} ${ss===1?'second':'seconds'}`:''].filter(Boolean).join(' and ');}
+      function words(s){s=Math.max(0,Math.ceil(s));if(!s)return 'zero seconds';const h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;return [h?`${h} ${h===1?'hour':'hours'}`:'',m?`${m} ${m===1?'minute':'minutes'}`:'',ss?`${ss} ${ss===1?'second':'seconds'}`:''].filter(Boolean).join(' and ');} 
       function announce(msg,urgent=false){const el=$(urgent?'urgent':'announcement');if(liveMessage===msg && Date.now()-lastAnnouncement<1000)return;liveMessage=msg;lastAnnouncement=Date.now();el.textContent='';requestAnimationFrame(()=>{el.textContent=msg;});}
       function unlock(){try{if(!audio){const C=window.AudioContext||window.webkitAudioContext;if(C)audio=new C();}if(audio?.state==='suspended')audio.resume().catch(()=>{});}catch(_){} }
       function speak(msg){if(!speechOn)return false;if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return false;try{window.speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(msg);utter.rate=1.1;utter.volume=1;window.speechSynthesis.speak(utter);return true;}catch(_){return false;}}
       function beep(freq=560,length=.06,volume=.028){if(!speechOn||!audio||audio.state!=='running')return;try{const t=audio.currentTime,osc=audio.createOscillator(),gain=audio.createGain();osc.type='sine';osc.frequency.value=freq;gain.gain.setValueAtTime(.001,t);gain.gain.linearRampToValueAtTime(volume,t+.006);gain.gain.exponentialRampToValueAtTime(.001,t+length);osc.connect(gain);gain.connect(audio.destination);osc.start(t);osc.stop(t+length+.01);osc.onended=()=>{osc.disconnect();gain.disconnect();};}catch(_){} }
       function finishBeep(){beep(660,.22,.11);setTimeout(()=>beep(820,.35,.11),230);}
-      async function lockAwake(){if(wakeLock||state.phase!=='running'||document.visibilityState==='hidden'||!navigator.wakeLock)return;try{const w=await navigator.wakeLock.request('screen');wakeLock=w;w.addEventListener('release',()=>{if(wakeLock===w)wakeLock=null;},{once:true});if(state.phase!=='running')releaseAwake();}catch(_){}}
-      function releaseAwake(){if(wakeLock){const w=wakeLock;wakeLock=null;w.release().catch(()=>{});}}
-      function save(){try{localStorage.setItem(KEY,JSON.stringify({phase:state.phase,durationMs:state.durationMs,remainingMs:state.remainingMs,deadline:state.deadline,speechOn}));}catch(_){}}
-      function restore(){try{const o=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(OLD_KEY)||'null');if(!o)return;if(typeof o.speechOn==='boolean')speechOn=o.speechOn;const m=Number(o.remainingMs),d=Number(o.durationMs);if(!Number.isFinite(m)||!Number.isFinite(d)||m<0||d<0||m>3600000||d>3600000)return;if(!['ready','running','paused','finished'].includes(o.phase))return;state.durationMs=d;state.remainingMs=m;state.phase=o.phase;if(o.phase==='running'){const epoch=Number(o.deadline);if(!Number.isFinite(epoch))return;state.deadline=epoch;state.remainingMs=Math.max(0,epoch-Date.now());if(state.remainingMs<=0)state.phase='finished';}state.lastWholeSecond=seconds();}catch(_){}}
-      function getSetting(clientY){const box=stage.getBoundingClientRect();const p=clamp(1-(clientY-box.top)/box.height,0,1);const step=15;return clamp(Math.round(MAX_SECONDS*p/step)*step,0,MAX_SECONDS);}
-      function stageTicks(){for(let s=0;s<=MAX_SECONDS;s+=60){const item=document.createElement('div');item.className='tick'+(s%300===0?' major':'');item.style.top=`${clamp(100-(s/MAX_SECONDS)*100,1,99)}%`;if(s%300===0){const label=document.createElement('span');label.textContent=String(s/60);item.appendChild(label);}ticks.appendChild(item);}}
-      function render(force=false){const s=seconds();if(!force&&s===lastRendered)return;lastRendered=s;stage.dataset.phase=state.phase;fill.style.height=`${clamp(state.remainingMs/MAX_SECONDS/1000*100,0,100)}%`;
+      async function lockAwake(){
+        if(!prefs.keepAwake||wakeLock||wakePending||state.phase!=='running'||document.visibilityState==='hidden'){updateWakeStatus();return;}
+        if(!navigator.wakeLock?.request){updateWakeStatus();return;}
+        wakePending=true;updateWakeStatus();
+        try{
+          const w=await navigator.wakeLock.request('screen');
+          if(!prefs.keepAwake||state.phase!=='running'||document.visibilityState==='hidden')await w.release();
+          else {wakeLock=w;w.addEventListener('release',()=>{if(wakeLock===w)wakeLock=null;updateWakeStatus();},{once:true});}
+        }catch(_){/* OS/browser can deny wake lock when battery is low. */}
+        finally{wakePending=false;updateWakeStatus();}
+      }
+      function releaseAwake(){if(wakeLock){const w=wakeLock;wakeLock=null;w.release().catch(()=>{});}updateWakeStatus();}
+      function updateWakeStatus(){
+        if(!wakeStatus)return;
+        if(!prefs.keepAwake){wakeStatus.textContent='Off. The device may dim or lock normally.';return;}
+        if(!navigator.wakeLock?.request){wakeStatus.textContent='This browser does not support keeping the screen on.';return;}
+        wakeStatus.textContent=wakeLock?'Screen-on lock active.':wakePending?'Requesting screen-on lock…':state.phase!=='running'?'On. The screen will stay awake while the timer runs, if permitted.':'Screen-on lock unavailable or released. Check battery saver and device settings.';
+      }
+      function save(){try{localStorage.setItem(KEY,JSON.stringify({phase:state.phase,durationMs:state.durationMs,remainingMs:state.remainingMs,deadline:state.deadline,prefs,lastSpokenMode,speechOn}));}catch(_){}}
+      function restore(){try{
+        const o=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(OLD_KEY)||localStorage.getItem(LEGACY_KEY)||'null');if(!o)return;
+        if(o.prefs&&typeof o.prefs==='object'){
+          const p=o.prefs;
+          if(SCALES.includes(Number(p.scaleHours)))prefs.scaleHours=Number(p.scaleHours);
+          if(MODES.includes(p.speechMode))prefs.speechMode=p.speechMode;
+          if(PALETTES[p.palette])prefs.palette=p.palette;
+          if(typeof p.keepAwake==='boolean')prefs.keepAwake=p.keepAwake;
+        } else if(o.speechOn===false) prefs.speechMode='off';
+        if(MODES.includes(o.lastSpokenMode)&&o.lastSpokenMode!=='off')lastSpokenMode=o.lastSpokenMode;
+        else if(prefs.speechMode!=='off')lastSpokenMode=prefs.speechMode;
+        speechOn=prefs.speechMode!=='off';
+        const m=Number(o.remainingMs),d=Number(o.durationMs);
+        if(!Number.isFinite(m)||!Number.isFinite(d)||m<0||d<0||m>86400000||d>86400000)return;
+        if(!['ready','running','paused','finished'].includes(o.phase))return;
+        state.durationMs=d;state.remainingMs=m;state.phase=o.phase;
+        if(o.phase==='running'){
+          const epoch=Number(o.deadline);if(!Number.isFinite(epoch))return;
+          state.deadline=epoch;state.remainingMs=Math.max(0,epoch-Date.now());
+          if(state.remainingMs<=0)state.phase='finished';
+        }
+        state.lastWholeSecond=seconds();
+      }catch(_){}}
+      function getSetting(clientY){const box=stage.getBoundingClientRect();const p=clamp(1-(clientY-box.top)/box.height,0,1);const step={1:15,5:60,12:300,24:300}[prefs.scaleHours];return clamp(Math.round(MAX_SECONDS*p/step)*step,0,MAX_SECONDS);}
+      function stageTicks(){
+        ticks.replaceChildren();
+        const unit={1:60,5:300,12:900,24:1800}[prefs.scaleHours];
+        const major={1:300,5:1800,12:3600,24:7200}[prefs.scaleHours];
+        const fmt=s=>s===0?'0':s<3600?`${s/60}m`:s%3600===0?`${s/3600}h`:`${Math.floor(s/3600)}h30`;
+        for(let s=0;s<=MAX_SECONDS;s+=unit){
+          const item=document.createElement('div');const isMajor=s%major===0;
+          item.className='tick'+(isMajor?' major':'');item.style.top=`${clamp(100-(s/MAX_SECONDS)*100,1,99)}%`;
+          if(isMajor){const label=document.createElement('span');label.textContent=fmt(s);item.appendChild(label);}
+          ticks.appendChild(item);
+        }
+        stage.setAttribute('aria-valuemax',String(MAX_SECONDS/60));
+      }
+      function render(force=false){const s=seconds();if(!force&&s===lastRendered)return;lastRendered=s;stage.dataset.phase=state.phase;fill.style.height=`${clamp(state.remainingMs/(MAX_SECONDS*1000)*100,0,100)}%`;
         const labels={ready:'TAP TO SET TIME',setting:'RELEASE TO START',running:'TIME REMAINING',paused:'PAUSED',finished:'TIME IS UP'};
-        status.textContent={ready:'READY',setting:'SETTING',running:'RUNNING',paused:'PAUSED',finished:'FINISHED'}[state.phase];phaseText.textContent=labels[state.phase];digits.textContent=formatDigital(s);digits.classList.toggle('long',s>=3600);
+        status.textContent=`${{ready:'READY',setting:'SETTING',running:'RUNNING',paused:'PAUSED',finished:'FINISHED'}[state.phase]} · ${prefs.scaleHours}H SCALE`; phaseText.textContent=labels[state.phase];digits.textContent=formatDigital(s);digits.classList.toggle('long',s>=3600);digits.classList.toggle('extra-long',s>=36000);
         instructions.textContent=Date.now()<clearFeedbackUntil?'TIMER CLEARED':state.phase==='running'?'Tap to hear · Hold to clear':state.phase==='paused'?'Tap to hear · Hold to clear':state.phase==='finished'?'Tap to start another timer':state.phase==='setting'?'Release to start':'Tap a height to start';
         const v=`${words(s)}. ${state.phase==='running'?'Remaining':state.phase==='paused'?'Paused':state.phase==='finished'?'Time is up':state.phase==='setting'?'Selecting':'Selected'}.`;
         stage.setAttribute('aria-valuenow',String(Math.ceil(s/60)));stage.setAttribute('aria-valuetext',v);
@@ -156,8 +305,15 @@
       function toggle(){unlock();if(state.phase==='running')pause();else if(state.phase==='paused')resume();else if(state.phase==='finished'&&state.durationMs>0)start(state.durationMs/1000);else if(state.phase==='ready'&&seconds()>0)start(seconds());else speakTime();}
       function ready(s){s=clamp(Math.round(s),0,MAX_SECONDS);state.phase='ready';state.remainingMs=s*1000;state.durationMs=s*1000;state.deadline=0;render(true);const msg=`${words(s)} selected.`;speak(msg);announce(msg);save();}
       function preview(s){if(state.phase==='setting'&&s===seconds())return;state.phase='setting';state.remainingMs=s*1000;state.durationMs=s*1000;state.deadline=0;render(true);const now=performance.now();const substantial=lastPreviewValue===null||Math.abs(s-lastPreviewValue)>=15;if(substantial&&(lastPreviewValue===null||now-lastPreviewSpeech>=500)){lastPreviewSpeech=now;lastPreviewValue=s;speak(words(s));}}
-      function scheduledCue(s){if(s<=10)return s>=1;return s===30||s===60||s%60===0;}
-      function pulse(){if(state.phase!=='running')return;const old=state.lastWholeSecond;state.remainingMs=remaining();const current=seconds();if(current!==old){state.lastWholeSecond=current;render(true);if(current<=0){finish();return;}if(document.visibilityState!=='hidden'&&old-current===1){beep(current<=10?780:490,.045,current<=10?.06:.017);if(scheduledCue(current)){const msg=current<=10?String(current):`${words(current)} remaining`;speak(msg);if(current===10||current===30||current===60)announce(`${words(current)} remaining`);}}}else{fill.style.height=`${clamp(state.remainingMs/MAX_SECONDS/1000*100,0,100)}%`;}}
+      function scheduledCue(s){
+        const mode=prefs.speechMode;if(!speechOn||mode==='off'||mode==='manual')return false;
+        if(s>=1&&s<=10)return true;
+        if(s===30||s===60)return true;
+        if(mode==='milestones')return [12*3600,6*3600,3*3600,3600,1800,600,300,120].includes(s);
+        const cadence={five:300,minute:60,thirty:30,fifteen:15}[mode]||60;
+        return s%cadence===0;
+      }
+      function pulse(){if(state.phase!=='running')return;const old=state.lastWholeSecond;state.remainingMs=remaining();const current=seconds();if(current!==old){state.lastWholeSecond=current;render(true);if(current<=0){finish();return;}if(document.visibilityState!=='hidden'&&old-current===1){if(scheduledCue(current)){beep(current<=10?780:490,.045,current<=10?.06:.017);const msg=current<=10?String(current):`${words(current)} remaining`;speak(msg);if(current===10||current===30||current===60)announce(`${words(current)} remaining`);}}}else{fill.style.height=`${clamp(state.remainingMs/(MAX_SECONDS*1000)*100,0,100)}%`;}}
       // One tap sets and starts the timer. During a countdown, a tap speaks remaining time.
       // A continuous 3-second press clears, with a spoken warning at 1 second.
       function cancelHold(){
@@ -254,6 +410,30 @@
         const warning='Clear timer? Activate Clear timer again to confirm.';
         speak(warning);announce(warning,true);
       });
+      function applyPalette(){const c=PALETTES[prefs.palette];for(const [name,value] of Object.entries(c))document.documentElement.style.setProperty(`--${name}`,value);document.querySelector('meta[name="theme-color"]').setAttribute('content',c.night);}
+      function syncSettingsUI(){
+        for(const name of ['speechMode','scaleHours','palette']){
+          const value=String(prefs[name]);
+          const input=settingsDrawer.querySelector(`input[name="${name}"][value="${value}"]`);
+          if(input)input.checked=true;
+        }
+        wakeToggle.checked=prefs.keepAwake;updateWakeStatus();
+      }
+      function setScale(hours){
+        if(!SCALES.includes(hours))return;
+        prefs.scaleHours=hours;MAX_SECONDS=hours*3600;
+        stageTicks();render(true);save();
+        const msg=`${hours} hour timer ruler selected. Existing countdown unchanged.`;speak(msg);announce(msg);
+      }
+      function setSpeechMode(mode){
+        if(!MODES.includes(mode))return;
+        prefs.speechMode=mode;speechOn=mode!=='off';
+        if(speechOn)lastSpokenMode=mode;
+        if(!speechOn)try{window.speechSynthesis?.cancel();}catch(_){}
+        refreshVoice();syncSettingsUI();save();
+        const labels={off:'Voice off.',manual:'Speech only when tapped.',milestones:'Spoken updates at key moments.',five:'Spoken updates every five minutes.',minute:'Spoken updates every minute.',thirty:'Spoken updates every thirty seconds.',fifteen:'Spoken updates every fifteen seconds.'};
+        if(mode!=='off')speak(labels[mode]);announce(labels[mode]);
+      }
       function refreshVoice(){
         voiceControl.setAttribute('aria-pressed',String(speechOn));
         voiceControl.setAttribute('aria-label',speechOn?'Voice on. Tap to turn voice off':'Voice off. Tap to turn voice on');
@@ -262,21 +442,90 @@
       }
       voiceControl.addEventListener('click',()=>{
         unlock();
-        speechOn=!speechOn;
+        if(speechOn){lastSpokenMode=prefs.speechMode==='off'?'minute':prefs.speechMode;prefs.speechMode='off';}
+        else prefs.speechMode=lastSpokenMode==='off'?'minute':lastSpokenMode;
+        speechOn=prefs.speechMode!=='off';
         if(!speechOn){try{window.speechSynthesis?.cancel();}catch(_){} }
-        refreshVoice();
+        refreshVoice();syncSettingsUI();
         if(speechOn)speak('Voice on.');
         announce(speechOn?'Voice on.':'Voice off.');save();
       });
       fullscreenControl.addEventListener('click',()=>{const target=$('app');if(document.fullscreenElement){document.exitFullscreen?.().catch(()=>{});}else if(target.requestFullscreen){target.requestFullscreen().catch(()=>announce('Your browser does not permit full screen mode.'));}else{announce('Full screen is available when the app is installed.');}});
       document.addEventListener('fullscreenchange',()=>fullscreenControl.setAttribute('aria-label',document.fullscreenElement?'Exit full screen':'Enter full screen'));
       document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){releaseAwake();save();}else if(state.phase==='running'){state.remainingMs=remaining();state.lastWholeSecond=seconds();if(state.remainingMs<=0)finish(false);else lockAwake();render(true);}});
-      window.addEventListener('pagehide',save);
+      window.addEventListener('pagehide',()=>{save();releaseAwake();});
       window.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();toggle();}});
-      stageTicks();restore();refreshVoice();render(true);
+      let drawerOpen=false;
+      function openDrawer(){
+        if(drawerOpen)return;drawerOpen=true;settingsShade.hidden=false;settingsDrawer.hidden=false;
+        settingsControl.setAttribute('aria-expanded','true');stage.inert=true;controls.inert=true;$('topControls').inert=true;
+        syncSettingsUI();closeSettings.focus();speak('Settings opened.');
+      }
+      function closeDrawer(){
+        if(!drawerOpen)return;drawerOpen=false;settingsShade.hidden=true;settingsDrawer.hidden=true;
+        stage.inert=false;controls.inert=false;$('topControls').inert=false;
+        settingsControl.setAttribute('aria-expanded','false');settingsControl.focus();speak('Settings closed.');
+      }
+      settingsControl.addEventListener('click',openDrawer);
+      closeSettings.addEventListener('click',closeDrawer);
+      settingsShade.addEventListener('click',closeDrawer);
+      settingsDrawer.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){e.preventDefault();closeDrawer();return;}
+        if(e.key!=='Tab')return;
+        const focusable=Array.from(settingsDrawer.querySelectorAll('button:not([hidden]):not([disabled]),input:not([disabled])')).filter(el=>el.getClientRects().length);
+        if(!focusable.length)return;
+        const first=focusable[0],last=focusable[focusable.length-1];
+        if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+        if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+      });
+      settingsDrawer.addEventListener('change',e=>{
+        const target=e.target;
+        if(target.name==='scaleHours')setScale(Number(target.value));
+        else if(target.name==='palette'&&PALETTES[target.value]){prefs.palette=target.value;applyPalette();save();const msg=`${target.closest('label').innerText.trim()} selected.`;speak(msg);announce(msg);}
+        else if(target.name==='speechMode')setSpeechMode(target.value);
+        else if(target===wakeToggle){prefs.keepAwake=target.checked;if(prefs.keepAwake)lockAwake();else releaseAwake();updateWakeStatus();save();const msg=prefs.keepAwake?'Keep screen on enabled while counting down.':'Keep screen on disabled.';speak(msg);announce(msg);}
+      });
+      function markUpdate(waiting){updateWaiting=waiting;applyUpdate.hidden=!waiting;updateStatus.textContent=waiting?'An update is ready. Install it when convenient. Your timer is saved.':'App is up to date or ready for offline use.';}
+      async function checkUpdates(){
+        if(!serviceRegistration){updateStatus.textContent='Offline updates require HTTPS or localhost.';return;}
+        updateStatus.textContent='Checking for updates…';
+        try{await serviceRegistration.update();markUpdate(serviceRegistration.waiting||null);}
+        catch(_){updateStatus.textContent='Unable to check now. The offline timer still works.';}
+      }
+      updateAction.addEventListener('click',checkUpdates);
+      applyUpdate.addEventListener('click',()=>{
+        if(!updateWaiting)return;
+        updateStatus.textContent='Installing update…';reloadingForUpdate=true;
+        updateWaiting.postMessage({type:'SKIP_WAITING'});
+      });
+      window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;installAction.hidden=false;installStatus.textContent='Install this timer on your device.';});
+      installAction.addEventListener('click',async()=>{
+        if(!deferredInstallPrompt)return;
+        deferredInstallPrompt.prompt();
+        const result=await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt=null;installAction.hidden=true;
+        installStatus.textContent=result.outcome==='accepted'?'Installation accepted.':'You can install later from your browser menu.';
+      });
+      window.addEventListener('appinstalled',()=>{installAction.hidden=true;installStatus.textContent='Timer installed.';});
+      async function registerPWA(){
+        if(!('serviceWorker' in navigator)||!['https:','http:'].includes(location.protocol)||(!isSecureContext&&location.hostname!=='localhost')){updateStatus.textContent='Offline installation requires HTTPS or localhost.';return;}
+        try{
+          serviceRegistration=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
+          const watch=worker=>{if(!worker)return;worker.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller)markUpdate(serviceRegistration.waiting||worker);});};
+          watch(serviceRegistration.installing);
+          serviceRegistration.addEventListener('updatefound',()=>watch(serviceRegistration.installing));
+          if(serviceRegistration.waiting)markUpdate(serviceRegistration.waiting);
+          navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloadingForUpdate){reloadingForUpdate=false;location.reload();}});
+          serviceRegistration.update().catch(()=>{});
+        }catch(_){updateStatus.textContent='Offline installation unavailable in this browser.';}
+      }
+      window.addEventListener('online',()=>{if(serviceRegistration)serviceRegistration.update().catch(()=>{});});
+      window.addEventListener('pageshow',()=>{if(state.phase==='running'){state.remainingMs=remaining();if(state.remainingMs<=0)finish(false);else lockAwake();render(true);}if(serviceRegistration)serviceRegistration.update().catch(()=>{});});
+      restore();MAX_SECONDS=prefs.scaleHours*3600;stageTicks();applyPalette();refreshVoice();syncSettingsUI();render(true);
       setInterval(pulse,100);
-      // Refresh offline assets automatically when a new version is deployed.
-      if('serviceWorker'in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').then(r=>r.update()).catch(()=>{}));
+      if(state.phase==='running')lockAwake();
+      if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone)installStatus.textContent='Timer installed and running as an app.';
+      window.addEventListener('load',registerPWA);
     })();
   </script>
 </body>

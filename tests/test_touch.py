@@ -1,9 +1,9 @@
 from playwright.sync_api import sync_playwright
 from pathlib import Path
-content=Path('/mnt/data/tap-first-timer/index.html').read_text()
+content=(Path(__file__).resolve().parents[1]/'index.html').read_text()
 init="""window.__spoken=[]; Object.defineProperty(window,'speechSynthesis',{configurable:true,value:{cancel(){},speak(u){window.__spoken.push(u.text)}}}); window.SpeechSynthesisUtterance=class{constructor(t){this.text=t}};"""
 with sync_playwright() as p:
- b=p.chromium.launch(headless=True,executable_path='/usr/bin/chromium',args=['--no-sandbox'])
+ b=p.chromium.launch(headless=True,args=['--no-sandbox'],**({'executable_path':'/usr/bin/chromium'} if Path('/usr/bin/chromium').exists() else {}))
  c=b.new_context(viewport={'width':390,'height':844},has_touch=True,is_mobile=True)
  c.add_init_script(init);page=c.new_page();page.set_content(content)
  page.touchscreen.tap(160,630)

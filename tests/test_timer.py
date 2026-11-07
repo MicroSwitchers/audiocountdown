@@ -1,7 +1,7 @@
 from playwright.sync_api import sync_playwright
 from pathlib import Path
 import time
-CONTENT=Path('/mnt/data/tap-first-timer/index.html').read_text()
+CONTENT=(Path(__file__).resolve().parents[1]/'index.html').read_text()
 INIT="""
 window.__speechLog=[];
 const __mock = {cancel(){window.__speechLog.push('[cancel]')},speak(u){window.__speechLog.push(u.text)},getVoices(){return[];}};
@@ -10,7 +10,7 @@ window.SpeechSynthesisUtterance=class {constructor(s){this.text=s;this.rate=1;th
 """
 def run():
  with sync_playwright() as p:
-  browser=p.chromium.launch(headless=True,executable_path='/usr/bin/chromium',args=['--no-sandbox'])
+  browser=p.chromium.launch(headless=True,args=['--no-sandbox'],**({'executable_path':'/usr/bin/chromium'} if Path('/usr/bin/chromium').exists() else {}))
   for w,h in [(390,844),(320,568),(844,390),(1280,800)]:
    ctx=browser.new_context(viewport={'width':w,'height':h},device_scale_factor=1, is_mobile=w<500,has_touch=w<500)
    ctx.add_init_script(INIT)
@@ -22,7 +22,7 @@ def run():
    assert metrics['scrollHeight']<=metrics['clientHeight'],(w,h,metrics)
    assert metrics['scrollWidth']<=metrics['clientWidth'],(w,h,metrics)
    assert not errors,errors
-   page.screenshot(path=f'/mnt/data/tap-first-timer/preview-{w}x{h}.png')
+   page.screenshot(path=str(Path(__file__).resolve().parents[1]/f'preview-{w}x{h}.png'))
    print('viewport',w,h,'ok')
    ctx.close()
   ctx=browser.new_context(viewport={'width':390,'height':844},has_touch=True,is_mobile=True)

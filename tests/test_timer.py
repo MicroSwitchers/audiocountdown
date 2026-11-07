@@ -29,7 +29,7 @@ def run():
   ctx.add_init_script(INIT)
   page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.set_content(CONTENT,wait_until="load")
-  assert page.locator('#voiceLabel').inner_text()=='VOICE ON'
+  assert page.locator('#voiceControl').count()==0, 'Voice control should only be in settings'
   x,y=195,660
   page.mouse.click(x,y)
   assert page.locator('#timer').get_attribute('data-phase')=='running','tap failed to start'
@@ -41,40 +41,43 @@ def run():
   assert page.locator('#timer').get_attribute('data-phase')=='running','tap reset active timer'
   log=page.evaluate('window.__speechLog')
   assert any('remaining' in s for s in log),log
-  # First stage of hold warning, release before full 3-second hold.
+  # Warning after 1s; release before full 4-second hold.
   page.mouse.move(x,y);page.mouse.down();page.wait_for_timeout(1150)
   assert page.locator('#holdNotice').is_visible(),'hold warning missing'
-  assert any('two more seconds' in s for s in page.evaluate('window.__speechLog'))
+  assert any('three more seconds' in s for s in page.evaluate('window.__speechLog'))
   page.mouse.up()
   assert page.locator('#timer').get_attribute('data-phase')=='running','short hold cleared timer'
   assert not page.locator('#holdNotice').is_visible()
   assert 'Clear cancelled.' in page.evaluate('window.__speechLog')
-  # Full three second hold clears and confirms verbally.
-  page.mouse.move(x,y);page.mouse.down();page.wait_for_timeout(3170)
+  # Hold longer than the old 3-second threshold: timer must still be running.
+  page.mouse.move(x,y);page.mouse.down();page.wait_for_timeout(3230)
+  assert page.locator('#timer').get_attribute('data-phase')=='running', 'timer cleared early'
+  page.wait_for_timeout(930)
   assert page.locator('#timer').get_attribute('data-phase')=='ready','full hold did not clear'
   assert 'Timer cleared.' in page.evaluate('window.__speechLog')
   page.mouse.up()
   assert page.locator('#timer').get_attribute('data-phase')=='ready'
   # Voice on/off must actually suppress all app TTS, including hear and hold warnings.
-  page.locator('#voiceControl').click()
-  assert page.locator('#voiceControl').get_attribute('aria-pressed')=='false'
-  assert page.locator('#voiceLabel').inner_text()=='VOICE OFF'
+  page.locator('#settingsControl').click()
+  page.locator('input[name="speechMode"][value="off"]').check()
+  page.locator('#closeSettings').click()
   startlog=page.evaluate('window.__speechLog.filter(s=>s!=="[cancel]").length')
   page.mouse.click(x,y)
   page.mouse.click(x,y)
   page.locator('#hearControl').click()
-  page.mouse.move(x,y);page.mouse.down();page.wait_for_timeout(3100);page.mouse.up()
+  page.mouse.move(x,y);page.mouse.down();page.wait_for_timeout(4120);page.mouse.up()
   endlog=page.evaluate('window.__speechLog.filter(s=>s!=="[cancel]").length')
   assert startlog==endlog,('voice off ignored',startlog,endlog,page.evaluate('window.__speechLog'))
-  page.locator('#voiceControl').click()
-  assert page.locator('#voiceLabel').inner_text()=='VOICE ON'
-  assert 'Voice on.' in page.evaluate('window.__speechLog')
+  page.locator('#settingsControl').click()
+  page.locator('input[name="speechMode"][value="manual"]').check()
+  page.locator('#closeSettings').click()
+  assert any('Speech only when tapped' in v for v in page.evaluate('window.__speechLog'))
   page.mouse.click(x,y)
   page.locator('#mainControl').click()
   assert page.locator('#timer').get_attribute('data-phase')=='paused'
   page.locator('#mainControl').click()
   assert page.locator('#timer').get_attribute('data-phase')=='running'
   assert not errors,errors
-  print('tap, countdown, hear, hold warning, hold cancellation, 3-second clear, voice mute/unmute, pause/resume: OK')
+  print('tap, countdown, hear, hold warning, hold cancellation, 4-second clear, speech settings mute/unmute, pause/resume: OK')
   ctx.close();browser.close()
 if __name__=='__main__':run()

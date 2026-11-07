@@ -4,17 +4,17 @@ A single-screen, tap-first talking timer for people with low vision or blindness
 
 ## Core interactions
 
-- **Tap** at any height of the ruler to set the duration and start the countdown immediately. Dragging first lets you hear and preview the chosen duration.
+- **Tap** at any height of the ruler to set the duration and start the countdown immediately. Drag to adjust the duration. Spoken previews wait until your finger settles for about 420 ms; movements smaller than 14 screen pixels are ignored to prevent an announced time changing from tiny finger drift. On release, the app confirms the **exact** duration that starts.
 - **Tap an active timer** to hear the remaining time, without resetting it.
-- **Hold for one second** for a warning. Keep holding for **two additional seconds** to clear the timer, followed by “Timer cleared.” Releasing during the warning cancels clearing.
+- **Hold for one second** for a warning. Keep holding for **three additional seconds** to clear the timer, followed by “Timer cleared.” Releasing during the warning cancels clearing.
 - The large **PAUSE/RESUME** and **HEAR TIME** buttons appear only during a timer. There is also a keyboard/screen-reader-focusable Clear timer control requiring two activations within five seconds.
-- The **VOICE ON / VOICE OFF** button immediately changes mute state, cancels queued speech, and reflects the selected voice mode in Settings.
+- Voice on/off is available only in **Settings → Spoken feedback**, not on the timer face. Choosing **Voice off** cancels queued speech. Settings are remembered next time.
 
 ## Settings drawer
 
 The timer remains full-screen when the drawer is closed. Settings persist in local storage on this device.
 
-**Spoken feedback:** Voice off entirely; only when tapped; key moments; every 5 minutes, every minute, every 30 seconds, or every 15 seconds. Except for voice-off and tap-only modes, the automatic schedule includes 30 seconds and the final spoken ten seconds. All voice-on modes still speak when the timer is touched, and speak the selection while setting it.
+**Spoken feedback:** Voice off entirely; only when tapped; key moments; every 5 minutes, every minute, every 30 seconds, or every 15 seconds. Except for voice-off and tap-only modes, the automatic schedule includes 30 seconds and the final spoken ten seconds. All voice-on modes still speak when the timer is touched. While setting it, the app waits until your finger is steady before announcing the selected duration. A final announcement always confirms the actual duration when it begins. The delay and small movement threshold reduce stale announcements caused by touch jitter and speech-synthesis latency.
 
 **Ruler layout (maximum selectable duration, NOT an automatic timer preset):**
 
@@ -50,7 +50,8 @@ python tests/test_timer.py
 python tests/test_touch.py
 python tests/test_frequency.py
 python tests/test_settings.py
+python tests/test_selection_feedback.py
 node tests/test_worker.cjs
 ```
 
-The browser tests exercise screen sizes, tap/hold, mute, voice frequencies with a virtual clock, 24-hour ruler midpoint, scale changes without changing a running timer, immediate palette changes, persisted state with mocked storage, and mocked wake-lock request/release. The worker test exercises precaching, targeted cache cleanup, offline navigation fallback, and explicit update activation. **A real installed/offline PWA re-launch and VoiceOver/TalkBack interaction still require manual device testing**; the build environment blocks Chromium from navigating to its local HTTP server.
+The browser tests exercise screen sizes, tap/hold, mute through Settings, spoken-selection stability, voice frequencies with a virtual clock, 24-hour ruler midpoint, scale changes without changing a running timer, immediate palette changes, persisted state with mocked storage, and mocked wake-lock request/release. The worker test exercises precaching, targeted cache cleanup, offline navigation fallback, and explicit update activation. **A real installed/offline PWA re-launch and VoiceOver/TalkBack interaction still require manual device testing**; the build environment blocks Chromium from navigating to its local HTTP server.

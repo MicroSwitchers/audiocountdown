@@ -1,5 +1,5 @@
 /* Versioned, offline-first app shell. Updates are applied only when requested. */
-const VERSION='v6.0';
+const VERSION='v7.0';
 const PREFIX='talking-visual-countdown-';
 const CACHE=PREFIX+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon.svg','./icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-192.png','./icons/icon-maskable-512.png'];

@@ -18,7 +18,7 @@ with sync_playwright() as p:
  client.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
  assert page.locator('#timer').get_attribute('data-phase')=='running'
  client.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':160,'y':630,'id':12}]})
- page.wait_for_timeout(3150)
+ page.wait_for_timeout(4150)
  assert page.locator('#timer').get_attribute('data-phase')=='ready'
  client.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
  assert any('Timer cleared.'==t for t in page.evaluate('window.__spoken'))

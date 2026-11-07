@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
   <meta name="theme-color" content="#0a1120">
-  <meta name="description" content="A high-contrast full-screen talking timer. Tap to start, tap to hear, hold three seconds to clear.">
+  <meta name="description" content="A high-contrast full-screen talking timer. Tap to start, tap to hear, hold four seconds to clear.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Talking Visual Countdown</title>
@@ -34,12 +34,8 @@
     #topControls {position:absolute;z-index:6;right:max(14px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));display:flex;gap:8px;align-items:center;}
     .corner {min-height:52px;border:2px solid #fff;background:var(--night);color:#fff;border-radius:8px;font-size:15px;font-weight:850;letter-spacing:.05em;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:8px;}
     .corner svg {width:25px;height:25px;stroke:currentColor;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;fill:none;flex-shrink:0;}
-    .speaker-off {display:none}
-    #voiceControl[aria-pressed="false"] .speaker-on {display:none}
-    #voiceControl[aria-pressed="false"] .speaker-off {display:block}
-    #voiceControl[aria-pressed="false"] {background:#fff;color:var(--night);}
     #fullscreenControl {width:52px;padding:0;}
-    #status {position:absolute;z-index:2;top:max(26px,env(safe-area-inset-top));left:80px;max-width:calc(100% - 260px);font-size:clamp(13px,1.6vw,18px);font-weight:900;letter-spacing:.12em;}
+    #status {position:absolute;z-index:2;top:max(26px,env(safe-area-inset-top));left:80px;max-width:calc(100% - 190px);font-size:clamp(13px,1.6vw,18px);font-weight:900;letter-spacing:.12em;}
     #controls {position:absolute;z-index:6;left:50%;bottom:max(20px,calc(env(safe-area-inset-bottom) + 14px));width:min(520px,calc(100% - 44px));transform:translateX(-50%);display:flex;justify-content:center;gap:10px;}
     #controls.empty {width:min(360px,calc(100% - 44px));}
     .control {min-height:62px;min-width:140px;flex:1;border:2px solid white;border-radius:8px;background:var(--night);color:white;font-size:clamp(17px,1.9vw,23px);font-weight:900;line-height:1.15;padding:8px 12px;}
@@ -60,7 +56,7 @@
       #phase{font-size:14px}#instructions{font-size:16px;max-width:310px;padding:0 12px}
       .corner{min-height:48px;padding:0 9px;font-size:12px;gap:5px;border-radius:6px}.corner svg{width:21px;height:21px}
       #fullscreenControl{width:48px}#topControls{top:max(10px,env(safe-area-inset-top));right:9px;gap:6px}
-      #status{left:67px;top:max(25px,env(safe-area-inset-top));font-size:12px;max-width:calc(100% - 205px)}
+      #status{left:67px;top:max(25px,env(safe-area-inset-top));font-size:12px;max-width:calc(100% - 158px)}
       #controls{width:calc(100% - 35px);gap:8px}.control{min-height:62px;min-width:0;font-size:17px}
       #holdNotice{width:calc(100% - 44px);padding:15px 14px;top:23%;}
     }
@@ -125,15 +121,10 @@
       <div id="center" aria-hidden="true">
         <div id="phase">TAP TO SET TIME</div>
         <div id="digits">00:00</div>
-        <div id="instructions">Tap a height to start · Hold 3 seconds to clear</div>
+        <div id="instructions">Tap a height to start · Hold 4 seconds to clear</div>
       </div>
     </div>
-    <div id="topControls" role="group" aria-label="Voice and full screen">
-      <button type="button" class="corner" id="voiceControl" aria-label="Voice on. Tap to turn voice off" aria-pressed="true" title="Voice on">
-        <svg class="speaker-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15 9a5 5 0 0 1 0 6M18 6a9 9 0 0 1 0 12"/></svg>
-        <svg class="speaker-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4zM17 9l5 6m0-6-5 6"/></svg>
-        <span id="voiceLabel">VOICE ON</span>
-      </button>
+    <div id="topControls" role="group" aria-label="Display and settings">
       <button type="button" class="corner" id="fullscreenControl" aria-label="Enter full screen" title="Full screen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg></button>
       <button type="button" class="corner" id="settingsControl" aria-label="Settings" aria-haspopup="dialog" aria-controls="settingsDrawer" aria-expanded="false" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a2 2 0 0 0-2 2v.18a2 2 0 0 1-3 1.73l-.16-.1a2 2 0 0 0-2.73.73l-1 1.73a2 2 0 0 0 .73 2.73l.16.09a2 2 0 0 1 0 3.46l-.16.09a2 2 0 0 0-.73 2.73l1 1.73a2 2 0 0 0 2.73.73l.16-.09a2 2 0 0 1 3 1.73V22h4v-.18a2 2 0 0 1 3-1.73l.16.09a2 2 0 0 0 2.73-.73l1-1.73a2 2 0 0 0-.73-2.73l-.16-.09a2 2 0 0 1 0-3.46l.16-.09a2 2 0 0 0 .73-2.73l-1-1.73a2 2 0 0 0-2.73-.73l-.16.09a2 2 0 0 1-3-1.73V2Z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </div>
@@ -142,7 +133,7 @@
       <button type="button" class="control" id="hearControl">HEAR TIME</button>
       <button type="button" class="control" id="resetControl" aria-label="Clear timer. Activate twice to confirm." hidden>Clear timer</button>
     </div>
-    <div id="holdNotice" role="status" hidden><span id="holdText">KEEP HOLDING 2 SECONDS TO CLEAR</span><div id="holdTrack" aria-hidden="true"><div id="holdProgress"></div></div></div>
+    <div id="holdNotice" role="status" hidden><span id="holdText">KEEP HOLDING 3 MORE SECONDS TO CLEAR</span><div id="holdTrack" aria-hidden="true"><div id="holdProgress"></div></div></div>
 
     <div id="settingsShade" hidden></div>
     <aside id="settingsDrawer" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
@@ -202,21 +193,25 @@
       const PALETTES={blue:{night:'#0a1120',blue:'#164eaa',yellow:'#fece45'},gold:{night:'#060606',blue:'#996200',yellow:'#ffe05c'},cyan:{night:'#08141a',blue:'#006b72',yellow:'#8bfffb'},mono:{night:'#050505',blue:'#595959',yellow:'#ffffff'}};
       const MODES=['off','manual','milestones','five','minute','thirty','fifteen'];
       const SCALES=[1,5,12,24];
-      let prefs={scaleHours:1,speechMode:'minute',palette:'blue',keepAwake:false},lastSpokenMode='minute';
-      const KEY = 'talking-visual-countdown-fullscreen-v6';
+      let prefs={scaleHours:1,speechMode:'minute',palette:'blue',keepAwake:false};
+      const KEY = 'talking-visual-countdown-fullscreen-v7';
+      const PREVIOUS_KEY = 'talking-visual-countdown-fullscreen-v6';
       const OLD_KEY = 'talking-visual-countdown-fullscreen-v5';
       const LEGACY_KEY='talking-visual-countdown-fullscreen-v4';
       const $ = id => document.getElementById(id);
       const stage=$('timer'),fill=$('fill'),ticks=$('tickmarks'),status=$('status');
       const phaseText=$('phase'),digits=$('digits'),instructions=$('instructions');
       const main=$('mainControl'),hear=$('hearControl'),reset=$('resetControl'),controls=$('controls');
-      const voiceControl=$('voiceControl'),voiceLabel=$('voiceLabel'),fullscreenControl=$('fullscreenControl');
+      const fullscreenControl=$('fullscreenControl');
       const holdNotice=$('holdNotice'),holdProgress=$('holdProgress'),holdText=$('holdText');
       const settingsControl=$('settingsControl'),settingsDrawer=$('settingsDrawer'),settingsShade=$('settingsShade'),closeSettings=$('closeSettings');
       const wakeToggle=$('wakeToggle'),wakeStatus=$('wakeStatus'),updateStatus=$('updateStatus'),updateAction=$('updateAction'),applyUpdate=$('applyUpdate'),installAction=$('installAction'),installStatus=$('installStatus');
       let wakePending=false,serviceRegistration=null,updateWaiting=null,reloadingForUpdate=false,deferredInstallPrompt=null;
       const state={phase:'ready',durationMs:0,remainingMs:0,deadline:0,lastWholeSecond:-1};
-      let speechOn=true,activePointer=null,previewPrevious=null,lastPreviewSpeech=0,lastPreviewValue=null;
+      let speechOn=true,activePointer=null,previewPrevious=null,previewAnchorY=null,previewLastY=null,previewSpeechTimer=null,lastPreviewValue=null;
+      // Ignore tiny finger drift while speech is being prepared or played. Only announce
+      // the position after the finger has been still long enough to be meaningful.
+      const PREVIEW_JITTER_PX=14,PREVIEW_SETTLE_MS=420;
       let hold=null,clearConfirmUntil=0,clearFeedbackUntil=0;
       let audio=null,wakeLock=null,lastRendered=-1,liveMessage='',lastAnnouncement=0;
       const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,x));
@@ -248,9 +243,9 @@
         if(!navigator.wakeLock?.request){wakeStatus.textContent='This browser does not support keeping the screen on.';return;}
         wakeStatus.textContent=wakeLock?'Screen-on lock active.':wakePending?'Requesting screen-on lock…':state.phase!=='running'?'On. The screen will stay awake while the timer runs, if permitted.':'Screen-on lock unavailable or released. Check battery saver and device settings.';
       }
-      function save(){try{localStorage.setItem(KEY,JSON.stringify({phase:state.phase,durationMs:state.durationMs,remainingMs:state.remainingMs,deadline:state.deadline,prefs,lastSpokenMode,speechOn}));}catch(_){}}
+      function save(){try{localStorage.setItem(KEY,JSON.stringify({phase:state.phase,durationMs:state.durationMs,remainingMs:state.remainingMs,deadline:state.deadline,prefs}));}catch(_){}}
       function restore(){try{
-        const o=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(OLD_KEY)||localStorage.getItem(LEGACY_KEY)||'null');if(!o)return;
+        const o=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(PREVIOUS_KEY)||localStorage.getItem(OLD_KEY)||localStorage.getItem(LEGACY_KEY)||'null');if(!o)return;
         if(o.prefs&&typeof o.prefs==='object'){
           const p=o.prefs;
           if(SCALES.includes(Number(p.scaleHours)))prefs.scaleHours=Number(p.scaleHours);
@@ -258,8 +253,6 @@
           if(PALETTES[p.palette])prefs.palette=p.palette;
           if(typeof p.keepAwake==='boolean')prefs.keepAwake=p.keepAwake;
         } else if(o.speechOn===false) prefs.speechMode='off';
-        if(MODES.includes(o.lastSpokenMode)&&o.lastSpokenMode!=='off')lastSpokenMode=o.lastSpokenMode;
-        else if(prefs.speechMode!=='off')lastSpokenMode=prefs.speechMode;
         speechOn=prefs.speechMode!=='off';
         const m=Number(o.remainingMs),d=Number(o.durationMs);
         if(!Number.isFinite(m)||!Number.isFinite(d)||m<0||d<0||m>86400000||d>86400000)return;
@@ -289,7 +282,7 @@
       function render(force=false){const s=seconds();if(!force&&s===lastRendered)return;lastRendered=s;stage.dataset.phase=state.phase;fill.style.height=`${clamp(state.remainingMs/(MAX_SECONDS*1000)*100,0,100)}%`;
         const labels={ready:'TAP TO SET TIME',setting:'RELEASE TO START',running:'TIME REMAINING',paused:'PAUSED',finished:'TIME IS UP'};
         status.textContent=`${{ready:'READY',setting:'SETTING',running:'RUNNING',paused:'PAUSED',finished:'FINISHED'}[state.phase]} · ${prefs.scaleHours}H SCALE`; phaseText.textContent=labels[state.phase];digits.textContent=formatDigital(s);digits.classList.toggle('long',s>=3600);digits.classList.toggle('extra-long',s>=36000);
-        instructions.textContent=Date.now()<clearFeedbackUntil?'TIMER CLEARED':state.phase==='running'?'Tap to hear · Hold to clear':state.phase==='paused'?'Tap to hear · Hold to clear':state.phase==='finished'?'Tap to start another timer':state.phase==='setting'?'Release to start':'Tap a height to start';
+        instructions.textContent=Date.now()<clearFeedbackUntil?'TIMER CLEARED':state.phase==='running'?'Tap to hear · Hold 4s to clear':state.phase==='paused'?'Tap to hear · Hold 4s to clear':state.phase==='finished'?'Tap to start another timer':state.phase==='setting'?'Release to start':'Tap a height to start';
         const v=`${words(s)}. ${state.phase==='running'?'Remaining':state.phase==='paused'?'Paused':state.phase==='finished'?'Time is up':state.phase==='setting'?'Selecting':'Selected'}.`;
         stage.setAttribute('aria-valuenow',String(Math.ceil(s/60)));stage.setAttribute('aria-valuetext',v);
         stage.setAttribute('aria-readonly',String(isActive()));
@@ -304,7 +297,43 @@
       function speakTime(){unlock();const s=Math.ceil(remaining()/1000);const msg=state.phase==='finished'?'Time is up.':state.phase==='running'?`${words(s)} remaining.`:state.phase==='paused'?`Paused. ${words(s)} remaining.`:s>0?`${words(s)} selected. Press Start to begin.`:'Timer ready. Tap the screen to start a countdown.';speak(msg);announce(msg);}
       function toggle(){unlock();if(state.phase==='running')pause();else if(state.phase==='paused')resume();else if(state.phase==='finished'&&state.durationMs>0)start(state.durationMs/1000);else if(state.phase==='ready'&&seconds()>0)start(seconds());else speakTime();}
       function ready(s){s=clamp(Math.round(s),0,MAX_SECONDS);state.phase='ready';state.remainingMs=s*1000;state.durationMs=s*1000;state.deadline=0;render(true);const msg=`${words(s)} selected.`;speak(msg);announce(msg);save();}
-      function preview(s){if(state.phase==='setting'&&s===seconds())return;state.phase='setting';state.remainingMs=s*1000;state.durationMs=s*1000;state.deadline=0;render(true);const now=performance.now();const substantial=lastPreviewValue===null||Math.abs(s-lastPreviewValue)>=15;if(substantial&&(lastPreviewValue===null||now-lastPreviewSpeech>=500)){lastPreviewSpeech=now;lastPreviewValue=s;speak(words(s));}}
+      function stopPreviewVoice(){
+        if(previewSpeechTimer!==null){clearTimeout(previewSpeechTimer);previewSpeechTimer=null;}
+      }
+      function queuePreviewVoice(selected){
+        stopPreviewVoice();
+        if(!speechOn||lastPreviewValue===selected)return;
+        // The speech engine is asynchronous. Saying an earlier finger position while
+        // the user continues moving is misleading; require a stationary selection.
+        previewSpeechTimer=setTimeout(()=>{
+          previewSpeechTimer=null;
+          if(state.phase!=='setting'||activePointer===null||seconds()!==selected)return;
+          lastPreviewValue=selected;
+          previewAnchorY=previewLastY; // Latch at the finger position the user actually heard.
+          speak(`${words(selected)} selected.`);
+        },PREVIEW_SETTLE_MS);
+      }
+      function preview(s){
+        if(state.phase==='setting'&&s===seconds())return;
+        state.phase='setting';state.remainingMs=s*1000;state.durationMs=s*1000;state.deadline=0;
+        render(true);queuePreviewVoice(s);
+      }
+      function moveSelection(y){
+        previewLastY=y;
+        // A resting finger naturally shifts a few pixels; do not silently change
+        // a value that has already been spoken. Deliberate movement still adjusts it.
+        if(previewAnchorY!==null&&Math.abs(y-previewAnchorY)<PREVIEW_JITTER_PX)return;
+        previewAnchorY=y;
+        const selected=getSetting(y);
+        if(selected!==seconds()){
+          stopPreviewVoice();
+          if(speechOn)try{window.speechSynthesis?.cancel();}catch(_){}
+          lastPreviewValue=null;
+          preview(selected);
+        }else if(previewSpeechTimer!==null){
+          queuePreviewVoice(selected); // Finger is still moving; wait again.
+        }
+      }
       function scheduledCue(s){
         const mode=prefs.speechMode;if(!speechOn||mode==='off'||mode==='manual')return false;
         if(s>=1&&s<=10)return true;
@@ -315,7 +344,7 @@
       }
       function pulse(){if(state.phase!=='running')return;const old=state.lastWholeSecond;state.remainingMs=remaining();const current=seconds();if(current!==old){state.lastWholeSecond=current;render(true);if(current<=0){finish();return;}if(document.visibilityState!=='hidden'&&old-current===1){if(scheduledCue(current)){beep(current<=10?780:490,.045,current<=10?.06:.017);const msg=current<=10?String(current):`${words(current)} remaining`;speak(msg);if(current===10||current===30||current===60)announce(`${words(current)} remaining`);}}}else{fill.style.height=`${clamp(state.remainingMs/(MAX_SECONDS*1000)*100,0,100)}%`;}}
       // One tap sets and starts the timer. During a countdown, a tap speaks remaining time.
-      // A continuous 3-second press clears, with a spoken warning at 1 second.
+      // A continuous 4-second press clears, with a spoken warning at 1 second.
       function cancelHold(){
         if(!hold)return;
         clearTimeout(hold.warningTimer);clearTimeout(hold.clearTimer);clearInterval(hold.progressTimer);
@@ -326,18 +355,18 @@
         const h=hold;
         h.warningTimer=setTimeout(()=>{
           if(hold!==h)return;
-          h.warned=true;holdText.textContent='KEEP HOLDING 2 SECONDS TO CLEAR';
+          h.warned=true;holdText.textContent='KEEP HOLDING 3 MORE SECONDS TO CLEAR';
           holdNotice.hidden=false;holdProgress.style.width='0%';
-          const warning='Keep holding for two more seconds to clear the timer.';
+          const warning='Keep holding for three more seconds to clear the timer.';
           speak(warning);announce(warning,true);
           const start=performance.now();
-          h.progressTimer=setInterval(()=>{if(hold!==h)return;holdProgress.style.width=`${clamp((performance.now()-start)/2000*100,0,100)}%`;},40);
+          h.progressTimer=setInterval(()=>{if(hold!==h)return;holdProgress.style.width=`${clamp((performance.now()-start)/3000*100,0,100)}%`;},40);
         },1000);
         h.clearTimer=setTimeout(()=>{
           if(hold!==h)return;
           h.cleared=true;
           clear();
-        },3000);
+        },4000);
       }
       stage.addEventListener('pointerdown',e=>{
         if(e.pointerType==='mouse'&&e.button!==0)return;
@@ -349,7 +378,7 @@
           longPressStart(e);
         }else{
           previewPrevious={phase:state.phase,durationMs:state.durationMs,remainingMs:state.remainingMs};
-          lastPreviewSpeech=0;lastPreviewValue=null;preview(getSetting(e.clientY));
+          stopPreviewVoice();previewAnchorY=e.clientY;previewLastY=e.clientY;lastPreviewValue=null;preview(getSetting(e.clientY));
         }
       });
       stage.addEventListener('pointermove',e=>{
@@ -360,7 +389,7 @@
           }
           return;
         }
-        if(state.phase==='setting'){e.preventDefault();preview(getSetting(e.clientY));}
+        if(state.phase==='setting'){e.preventDefault();moveSelection(e.clientY);}
       });
       stage.addEventListener('pointerup',e=>{
         if(activePointer!==e.pointerId)return;
@@ -376,6 +405,9 @@
           return;
         }
         if(state.phase==='setting'){
+          stopPreviewVoice();previewAnchorY=null;previewLastY=null;
+          // Never recalculate on pointerup: the final spoken time must match
+          // the selection that was shown and actually starts.
           const s=seconds();
           if(s>0)start(s);
           else {state.phase='ready';state.remainingMs=0;render(true);save();speakTime();}
@@ -383,7 +415,7 @@
       });
       stage.addEventListener('pointercancel',e=>{
         if(activePointer!==e.pointerId)return;
-        activePointer=null;
+        activePointer=null;stopPreviewVoice();previewAnchorY=null;previewLastY=null;
         if(hold){const warned=hold.warned;cancelHold();if(warned){speak('Clear cancelled.');announce('Clear cancelled.');}return;}
         if(previewPrevious){Object.assign(state,previewPrevious);state.deadline=0;}
         else{state.phase='ready';state.remainingMs=0;}
@@ -428,28 +460,11 @@
       function setSpeechMode(mode){
         if(!MODES.includes(mode))return;
         prefs.speechMode=mode;speechOn=mode!=='off';
-        if(speechOn)lastSpokenMode=mode;
         if(!speechOn)try{window.speechSynthesis?.cancel();}catch(_){}
-        refreshVoice();syncSettingsUI();save();
+        syncSettingsUI();save();
         const labels={off:'Voice off.',manual:'Speech only when tapped.',milestones:'Spoken updates at key moments.',five:'Spoken updates every five minutes.',minute:'Spoken updates every minute.',thirty:'Spoken updates every thirty seconds.',fifteen:'Spoken updates every fifteen seconds.'};
         if(mode!=='off')speak(labels[mode]);announce(labels[mode]);
       }
-      function refreshVoice(){
-        voiceControl.setAttribute('aria-pressed',String(speechOn));
-        voiceControl.setAttribute('aria-label',speechOn?'Voice on. Tap to turn voice off':'Voice off. Tap to turn voice on');
-        voiceControl.title=speechOn?'Voice on':'Voice off';
-        voiceLabel.textContent=speechOn?'VOICE ON':'VOICE OFF';
-      }
-      voiceControl.addEventListener('click',()=>{
-        unlock();
-        if(speechOn){lastSpokenMode=prefs.speechMode==='off'?'minute':prefs.speechMode;prefs.speechMode='off';}
-        else prefs.speechMode=lastSpokenMode==='off'?'minute':lastSpokenMode;
-        speechOn=prefs.speechMode!=='off';
-        if(!speechOn){try{window.speechSynthesis?.cancel();}catch(_){} }
-        refreshVoice();syncSettingsUI();
-        if(speechOn)speak('Voice on.');
-        announce(speechOn?'Voice on.':'Voice off.');save();
-      });
       fullscreenControl.addEventListener('click',()=>{const target=$('app');if(document.fullscreenElement){document.exitFullscreen?.().catch(()=>{});}else if(target.requestFullscreen){target.requestFullscreen().catch(()=>announce('Your browser does not permit full screen mode.'));}else{announce('Full screen is available when the app is installed.');}});
       document.addEventListener('fullscreenchange',()=>fullscreenControl.setAttribute('aria-label',document.fullscreenElement?'Exit full screen':'Enter full screen'));
       document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){releaseAwake();save();}else if(state.phase==='running'){state.remainingMs=remaining();state.lastWholeSecond=seconds();if(state.remainingMs<=0)finish(false);else lockAwake();render(true);}});
@@ -521,7 +536,7 @@
       }
       window.addEventListener('online',()=>{if(serviceRegistration)serviceRegistration.update().catch(()=>{});});
       window.addEventListener('pageshow',()=>{if(state.phase==='running'){state.remainingMs=remaining();if(state.remainingMs<=0)finish(false);else lockAwake();render(true);}if(serviceRegistration)serviceRegistration.update().catch(()=>{});});
-      restore();MAX_SECONDS=prefs.scaleHours*3600;stageTicks();applyPalette();refreshVoice();syncSettingsUI();render(true);
+      restore();MAX_SECONDS=prefs.scaleHours*3600;stageTicks();applyPalette();syncSettingsUI();render(true);
       setInterval(pulse,100);
       if(state.phase==='running')lockAwake();
       if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone)installStatus.textContent='Timer installed and running as an app.';
